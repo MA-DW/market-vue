@@ -13,9 +13,12 @@ import AppSidebar from '@/components/AppSidebar.vue'
     <div class="wrapper d-flex flex-column min-vh-100">
       <AppHeader />
       <div class="body flex-grow-1">
-        <CContainer class="px-4" lg>
+        <CContainer class="px-4" fluid>
+          
+          <img src="../assets/images/detalle-header-flyer.png" style="position: absolute;right: 64px;height: 45px;z-index: 1;" />
           <AppBreadcrumb />
           <router-view />
+          
         </CContainer>
       </div>
       <AppFooter />

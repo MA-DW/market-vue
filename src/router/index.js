@@ -22,15 +22,15 @@ const routes = [
             /* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'
           ),
       },
+      // {
+      //   path: '/Home',
+      //   name: () => i18next.t('Home'),
+      //   redirect: '/Home/typography',
+      // },
       {
-        path: '/theme',
-        name: () => i18next.t('theme'),
-        redirect: '/theme/typography',
-      },
-      {
-        path: '/theme/colors',
-        name: () => i18next.t('colors'),
-        component: () => import('@/views/theme/Colors.vue'),
+        path: '/Home',
+        name: () => i18next.t('AVAILABILITY BUILDINGS'),
+        component: () => import('@/views/Home/Availability.vue'),
       },
       {
         path: '/theme/typography',
