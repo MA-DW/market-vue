@@ -69,15 +69,7 @@ onMounted(() => {
             >
               <CIcon class="me-2" icon="cil-moon" size="lg" /> Dark
             </CDropdownItem>
-            <CDropdownItem
-              :active="colorMode === 'auto'"
-              as="button"
-              class="d-flex align-items-center"
-              type="button"
-              @click="setColorMode('auto')"
-            >
-              <CIcon class="me-2" icon="cil-contrast" size="lg" /> Auto
-            </CDropdownItem>
+          
           </CDropdownMenu>
         </CDropdown>
         <li class="nav-item py-1">

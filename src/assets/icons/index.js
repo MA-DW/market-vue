@@ -30,6 +30,8 @@ import {
   cibCashapp,
   cilFilter,
   cilFilterX,
+  cilPhone,
+  cibLinkedinIn,
 } from '@coreui/icons'
 import { cifUs, cifBr, cifIn, cifFr, cifEs, cifPl, cifGb } from '@coreui/icons'
 import {
@@ -248,5 +250,7 @@ export const iconsSet = Object.assign(
     cibCashapp,
     cilFilter,
     cilFilterX,
+    cilPhone,
+    cibLinkedinIn,
   },
 )
