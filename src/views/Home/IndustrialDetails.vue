@@ -224,7 +224,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useIndustrialData } from '../composables/useIndustrialData'
+import { useIndustrialData } from './composables/useIndustrialData'
 import L from 'leaflet'
 import {
   cilArrowLeft,

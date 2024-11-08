@@ -1,4 +1,3 @@
-// components/AvailabilityStats.vue
 <template>
   <CRow>
     <CCol :md="12">

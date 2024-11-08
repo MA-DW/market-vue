@@ -1,4 +1,3 @@
-// components/LoadingSpinner.vue
 <template>
   <div 
     :class="[

@@ -1,4 +1,3 @@
-<!-- components/IndustrialMap.vue -->
 <template>
   <div class="map-wrapper" :class="{ 'expanded': isExpanded }">
     <div ref="mapRef" class="map-container"></div>
