@@ -148,7 +148,7 @@
                                         </CButton>
                                     </CCol>
                                     <CCol :md="6" class="text-center">
-                                        <CButton color="secondary" variant="outline" >
+                                        <CButton color="secondary" variant="outline" @click="handleReset">
                                             <CIcon :content="cilFilterX" size="sm" />
                                             RESET
                                         </CButton>
@@ -196,7 +196,9 @@
                                                     </CCol>
                                                     <CCol :md="8" class="CenterTextsHome">
                                                         <span class="text"> BUILDINGS CLASS A </span>
-                                                        <span class="subtext"> 18,872,089 SF </span>
+                                                        <!-- <span class="subtext"> 18,872,089 SF </span> -->
+                                                        <span class="number">{{ buildingStats.classACount }}</span>
+                                                        <span class="subtext">{{ buildingStats.classASF }} SF</span>
                                                     </CCol>
                                                 </CRow>
                                             </CCardBody>
@@ -211,7 +213,9 @@
                                                     </CCol>
                                                     <CCol :md="8" class="CenterTextsHome">
                                                         <span span class="text">BUILDINGS CLASS B</span>
-                                                        <span span class="subtext">18,872,089 SF</span>
+                                                        <!-- <span span class="subtext">18,872,089 SF</span> -->
+                                                        <span class="number">{{ buildingStats.classBCount }}</span>
+                                                        <span class="subtext">{{ buildingStats.classBSF }} SF</span>
                                                     </CCol>
                                                 </CRow>
                                             </CCardBody>
@@ -243,7 +247,9 @@
                                                     </CCol>
                                                     <CCol :md="8" class="CenterTextsHome">
                                                         <span span class="text">TOTAL BUILDINGS</span>
-                                                        <span span class="subtext">18,872,089 SF</span>
+                                                        <!-- <span span class="subtext">18,872,089 SF</span> -->
+                                                        <span class="number">{{ buildingStats.totalBuildings }}</span>
+                                                        <span class="subtext">{{ buildingStats.totalSF }} SF</span>
                                                     </CCol>
                                                 </CRow>
                                             </CCardBody>
@@ -403,70 +409,89 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, onUnmounted , computed} from 'vue'
-  import 'leaflet/dist/leaflet.css'
-  import L from 'leaflet'
-  import { cilFilter,cilFilterX } from '@coreui/icons'
-import { CCardHeader, CCol, CRow } from '@coreui/vue-pro';
-
-import { CChartDoughnut } from '@coreui/vue-chartjs'
+ import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useTableFilters } from './composables/useTableFilters'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+import { cilFilter, cilFilterX } from '@coreui/icons'
 import buildingsDataOriginal from './_data'
+
+import { CCardHeader, CCol, CRow } from '@coreui/vue-pro';
+import { CChartDoughnut } from '@coreui/vue-chartjs'
 
 const selected = ref([])
 
+// Convertir buildingsDataOriginal a ref
+const buildingsDataRef = ref(buildingsDataOriginal)
+
+// Usar el composable de filtros
+const {
+  filters,
+  filteredData,
+  resetFilters,
+  marketOptions,
+  submarketOptions,
+  classOptions,
+  stats
+} = useTableFilters(buildingsDataRef)
+
+// Actualizar buildingsData para usar los datos filtrados
 const buildingsData = computed(() =>
-  buildingsDataOriginal.map((item) => ({
+  filteredData.value.map((item) => ({
     ...item,
     _selected: selected.value.includes(item.id),
   }))
 )
 
-const check = (event, id) => {
-  if (event.target.checked) {
-    selected.value = [...selected.value, id]
-  } else {
-    selected.value = selected.value.filter((itemId) => itemId !== id)
-  }
-}
-
-const columns = [
-  { key: 'select', label: '',filter: false, sorter: false },
-  { key: 'buildingName', label: 'Building Name' },
-  { key: 'industrialPark', label: 'Industrial Park' },
-  { key: 'market', label: 'Market' },
-  { key: 'subMarket', label: 'Sub Market' },
-  { key: 'class', label: 'Class'},
-  { key: 'buildingSizeSF', label: 'Building Size SF' },
-  { key: 'availableSF', label: 'Available SF' },
-  { key: 'minimumSpaceSF', label: 'Minimum Space SF' },
-  { key: 'expansionUpToSF', label: 'Expansion Up To SF' },
-  { key: 'clearHeight', label: 'Clear Height' },
-  { key: 'registered', label: 'Registered' },
-  { key: 'status', label: 'Status' },
-]
-const getBadge = (status) => {
-  switch (status) {
-    case 'Active':
-      return 'success'
-    case 'Inactive':
-      return 'secondary'
-    case 'Pending':
-      return 'warning'
-    case 'Banned':
-      return 'danger'
-    default:
-      'primary'
-  }
-}
-const data = {
+// Actualizar la data del gráfico con las estadísticas
+const data = computed(() => ({
   labels: ['CLASS A', 'CLASS B'],
   datasets: [
     {
       backgroundColor: ['#18568a','#04034e'],
-      data: [66, 33],
+      data: [
+        (stats.value.classASF / stats.value.totalSF) * 100,
+        (stats.value.classBSF / stats.value.totalSF) * 100
+      ],
     },
   ],
+}))
+
+// Actualizar las variables de los filtros
+const selectedMarket = computed({
+  get: () => filters.value.market,
+  set: (value) => filters.value.market = value
+})
+
+const selectedSubmarket = computed({
+  get: () => filters.value.submarket,
+  set: (value) => filters.value.submarket = value
+})
+
+const selectedClass = computed({
+  get: () => filters.value.class,
+  set: (value) => filters.value.class = value
+})
+
+// ... resto de tu código existente ...
+
+// Actualizar el método de reset
+const handleReset = () => {
+  resetFilters()
 }
+
+// Actualizar las estadísticas en las cards
+const buildingStats = computed(() => ({
+  classACount: stats.value.classABuildings,
+  classBCount: stats.value.classBBuildings,
+  classASF: stats.value.classASF.toLocaleString(),
+  classBSF: stats.value.classBSF.toLocaleString(),
+  totalBuildings: stats.value.totalBuildings,
+  totalSF: stats.value.totalSF.toLocaleString()
+}))
+
+
+
 const options = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -483,9 +508,7 @@ const options = ref({
   }
 })
   const visibleExternalContent = ref(true)
-
-  
-  const mapRef = ref(null)
+const mapRef = ref(null)
   let map = null
   
   onMounted(() => {
@@ -532,31 +555,6 @@ const options = ref({
   })
 
 
-
-//   Filtros
-
-// Define tus opciones y estados aquí
-const selectedMarket = ref('')
-const selectedSubmarket = ref('')
-const selectedClass = ref('')
-const selectedType = ref('')
-const selectedDeal = ref('')
-const selectedAboveMarket = ref('')
-const availableSize = ref(0)
-const conversionSF = ref(true)
-const conversionSM = ref(false)
-const selectedRegion = ref('')
-const selectedCurrency = ref('')
-
-// Define las opciones para los selects (deberías llenar estas con tus datos reales)
-const marketOptions = ['Opción 1', 'Opción 2', 'Opción 3']
-const submarketOptions = ['Submarket 1', 'Submarket 2', 'Submarket 3']
-const classOptions = ['Class A', 'Class B', 'Class C']
-const typeOptions = ['Class A', 'Class B', 'Class C']
-const dealOptions = ['Deal 1', 'Deal 2', 'Deal 3']
-const aboveMarketOptions = ['Deal 1', 'Deal 2', 'Deal 3']
-const regionOptions = ['Region 1', 'Region 2', 'Region 3']
-const currencyOptions = ['USD', 'EUR', 'GBP']
   </script>
   
   <style scoped>

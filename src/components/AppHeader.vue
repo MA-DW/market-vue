@@ -13,7 +13,7 @@ import { useSidebarStore } from '@/stores/sidebar.js'
 const { t, i18next } = useTranslation()
 const aside = useAsideStore()
 const sidebar = useSidebarStore()
-const headerClassNames = ref('p-0')
+const headerClassNames = ref('mb-4 p-0')
 const { colorMode, setColorMode } = useColorModes('coreui-pro-vue-admin-template-theme-modern')
 
 onMounted(() => {
@@ -39,11 +39,38 @@ onMounted(() => {
         <CIcon icon="cil-menu" size="lg" />
       </CHeaderToggler>
 
-      <img src="../assets/images/market-logo.jpg" class="header-image" />
       <CHeaderNav class="ms-auto ms-md-0">
         <li class="nav-item py-1">
           <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
         </li>
+        <CDropdown variant="nav-item" placement="bottom-end">
+          <CDropdownMenu>
+            <CDropdownItem
+              :active="i18next.language === 'en'"
+              as="button"
+              class="d-flex align-items-center"
+              @click="i18next.changeLanguage('en')"
+            >
+              <CIcon class="me-2" icon="cif-gb" size="lg" /> English
+            </CDropdownItem>
+            <CDropdownItem
+              :active="i18next.language === 'es'"
+              as="button"
+              class="d-flex align-items-center"
+              @click="i18next.changeLanguage('es')"
+            >
+              <CIcon class="me-2" icon="cif-es" size="lg" /> Español
+            </CDropdownItem>
+            <CDropdownItem
+              :active="i18next.language === 'pl'"
+              as="button"
+              class="d-flex align-items-center"
+              @click="i18next.changeLanguage('pl')"
+            >
+              <CIcon class="me-2" icon="cif-pl" size="lg" /> Polski
+            </CDropdownItem>
+          </CDropdownMenu>
+        </CDropdown>
         <CDropdown variant="nav-item" placement="bottom-end">
           <CDropdownToggle :caret="false">
             <CIcon v-if="colorMode === 'dark'" icon="cil-moon" size="lg" />
@@ -69,13 +96,22 @@ onMounted(() => {
             >
               <CIcon class="me-2" icon="cil-moon" size="lg" /> Dark
             </CDropdownItem>
-          
+            <CDropdownItem
+              :active="colorMode === 'auto'"
+              as="button"
+              class="d-flex align-items-center"
+              type="button"
+              @click="setColorMode('auto')"
+            >
+              <CIcon class="me-2" icon="cil-contrast" size="lg" /> Auto
+            </CDropdownItem>
           </CDropdownMenu>
         </CDropdown>
         <li class="nav-item py-1">
           <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
         </li>
       </CHeaderNav>
+      <img src="../assets/images/market-logo.jpg" class="header-image" />
      
       
     </CContainer>
