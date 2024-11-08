@@ -1,5 +1,4 @@
 <template>
-    
         <CRow>
             <CCol :md="9" class="map-container">
                 <div id="map" ref="mapRef">&nbsp;</div>
