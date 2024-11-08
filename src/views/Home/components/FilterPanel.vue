@@ -105,7 +105,7 @@
                       placeholder="Min"
                     />
                   </CCol>
-                  <CCol :md="2" class="text-center">
+                  <CCol :md="2" class="text-center" style="padding: 5px 0;">
                     to
                   </CCol>
                   <CCol :md="5">
@@ -123,10 +123,10 @@
 
                 <!-- Unit Conversion -->
                 <CRow class="mb-2">
-                  <CCol :md="6">
+                  <CCol :md="5">
                     <CFormLabel>Conversion</CFormLabel>
                   </CCol>
-                  <CCol :md="2" class="text-end">
+                  <CCol :md="1" class="text-end">
                     <CFormLabel>SF</CFormLabel>
                   </CCol>
                   <CCol :md="2">
@@ -136,7 +136,7 @@
                       :checked="!filters.useMetric"
                     />
                   </CCol>
-                  <CCol :md="2" class="text-left">
+                  <CCol :md="3" class="text-left">
                     <CFormLabel>SM</CFormLabel>
                   </CCol>
                 </CRow>

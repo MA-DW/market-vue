@@ -19,7 +19,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>
@@ -33,7 +33,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>
@@ -47,7 +47,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>
@@ -61,7 +61,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>
@@ -75,7 +75,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>
@@ -89,7 +89,7 @@ const recentProperties = computed(() =>
             <CCol :md="2">
                 <CCard>
                     <CCardHeader  style="text-align: center">
-                        <img src="../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
+                        <img src="../../../assets/images/icons8-spinner-para-iphone-80.png" style="margin-bottom: 2rem;margin-top: 2rem;"/>
                     </CCardHeader>
                     <CCardBody style="    padding: 0px 11px;">
                         <CRow>

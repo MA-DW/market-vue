@@ -78,7 +78,6 @@ onUnmounted(() => {
 
 .content-wrapper {
   padding: 1rem;
-  height: calc(100vh - 72px);
 }
 
 .scroll-to-top {
