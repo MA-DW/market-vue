@@ -159,8 +159,46 @@ export const useMapControl = (mapData) => {
 
     // Si hay datos iniciales, añadir marcadores
     if (mapData.value && mapData.value.length > 0) {
-      updateMarkers()
+      // updateMarkers()
     }
+
+    const coordenadas = [
+      [25.68, -100.31],
+      [25.69, -100.32],
+      [25.67, -100.3],
+      [25.68, -100.31],
+    ];
+
+    const poligono = L.polygon(coordenadas, {
+        color: "blue", // Color del borde
+        fillColor: "lightblue", // Color del relleno
+        fillOpacity: 0.5 // Transparencia del relleno
+    }).addTo(map);
+
+    formas.push(poligono);
+
+    const bounds = [
+      [25.68, -100.32], // Esquina inferior izquierda
+      [25.7, -100.3] // Esquina superior derecha
+    ];
+  
+    const rectangulo = L.rectangle(bounds, {
+      color: "green",
+      weight: 2, // Grosor del borde
+      fillColor: "lightgreen",
+      fillOpacity: 0.5
+    }).addTo(map);
+  
+    formas.push(rectangulo);
+
+    const circulo = L.circle([25.6866, -100.3161], {  // Coordenadas cerca de Monterrey
+      radius: 500, // Radio en metros
+      color: "red", 
+      fillColor: "pink", 
+      fillOpacity: 0.5 
+    }).addTo(map);
+
+    formas.push(circulo); // Guardar el círculo
   }
 
   const updateMarkers = () => {
