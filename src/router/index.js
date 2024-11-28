@@ -56,8 +56,32 @@ const routes = [
         path: '/industrial/details/:id',
         name: 'industrial-details',
         component: () => import('@/views/Home/IndustrialDetails.vue')
+      },
+      {
+        path: '/theme/MARKET OVERVIEW',
+        name: 'market-overview',
+        component: () => import('@/views/theme/MarketOverview.vue')
+      },
+      {
+        path: '/theme/FIBRAS',
+        name: 'fibras',
+        component: () => import('@/views/theme/Fibras.vue')
+      },
+      {
+        path: '/theme/SETTINGS',
+        name: 'settings',
+        component: () => import('@/views/theme/Settings.vue')
+      },
+      {
+        path: '/MARKET REPORTS',
+        name: 'market-reports',
+        component: () => import('@/views/MarketReports.vue')
+      },
+      {
+        path: '/BI CHARTS',
+        name: 'bi-charts',
+        component: () => import('@/views/BiCharts.vue')
       }
-      // ... resto de tus rutas
     ]
   },
   // ... resto de tus rutas fuera del layout principal

@@ -124,16 +124,17 @@ import { CChartDoughnut } from '@coreui/vue-chartjs'
 import { cilArrowTop, cilArrowBottom } from '@coreui/icons'
 import CIcon from '@coreui/icons-vue'
 
-const { statistics } = useIndustrialData()
+const { filteredData, statistics } = useIndustrialData()
 
-// Configuración del gráfico de dona
+// El gráfico ahora usa los datos filtrados
 const chartData = computed(() => ({
-  labels: ['CLASS A', 'CLASS B'],
+  labels: ['CLASS A', 'CLASS B', 'UNDER CONSTRUCTION'],
   datasets: [{
-    backgroundColor: ['#18568a', '#04034e'],
+    backgroundColor: ['#18568a', '#04034e', '#1b9fce'],
     data: [
-      (statistics.value.classA.sf / statistics.value.total.sf) * 100 || 0,
-      (statistics.value.classB.sf / statistics.value.total.sf) * 100 || 0
+      statistics.value.classA.sf,
+      statistics.value.classB.sf,
+      statistics.value.underConstruction.sf
     ]
   }]
 }))

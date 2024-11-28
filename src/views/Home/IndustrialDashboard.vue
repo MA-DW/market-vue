@@ -8,10 +8,20 @@
       <div class="layout-container">
         <div class="content-wrapper" :class="{ 'filters-expanded': isExpanded }">
           <CRow>
-            <CCol :md="12" class="map-container">
-              <IndustrialMap />
+            <CCol :md="isExpanded ? 9 : 12" class="map-container transition-width">
+              <IndustrialMap :isExpanded="isExpanded" />
             </CCol>
+            <!-- Panel de Filtros -->
+            <div class="filter-sidebar" :class="{ 'expanded': isExpanded }">
               <FilterPanel />
+              <CButton 
+                color="primary"
+                class="toggle-filters"
+                @click="toggleFilters"
+              >
+                <CIcon :icon="isExpanded ? cilChevronRight : cilChevronLeft" />
+              </CButton>
+            </div>
           </CRow>
         </div>
       </div>
@@ -26,7 +36,7 @@
         class="scroll-to-top"
         :class="{ 'visible': showScrollButton }"
         @click="scrollToTop"
->
+      >
         <CIcon :icon="cilArrowTop" size="lg" />
       </CButton>
     </div>
@@ -36,7 +46,7 @@
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue'
 import { useIndustrialData } from './composables/useIndustrialData'
-import { cilArrowTop } from '@coreui/icons'
+import { cilArrowTop, cilChevronLeft, cilChevronRight } from '@coreui/icons'
 import CIcon from '@coreui/icons-vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import IndustrialMap from './components/IndustrialMap.vue'
@@ -47,6 +57,14 @@ import RecentProperties from './components/RecentProperties.vue'
 
 const { loading, loadData } = useIndustrialData()
 const showScrollButton = ref(false)
+const isExpanded = ref(false)
+
+const toggleFilters = () => {
+  isExpanded.value = !isExpanded.value
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, 300)
+}
 
 // Función para manejar el scroll
 const handleScroll = () => {
@@ -78,6 +96,37 @@ onUnmounted(() => {
 
 .content-wrapper {
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.map-container {
+  transition: width 0.3s ease;
+}
+
+.filter-sidebar {
+  position: fixed;
+  right: -300px;
+  top: 72px;
+  width: 300px;
+  height: calc(100vh - 72px);
+  background: white;
+  transition: right 0.3s ease;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.filter-sidebar.expanded {
+  right: 0;
+}
+
+.toggle-filters {
+  position: absolute;
+  left: -40px;
+  top: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px 0 0 4px;
+  padding: 0;
 }
 
 .scroll-to-top {
@@ -91,30 +140,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 1040;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: opacity 0.3s;
 }
 
 .scroll-to-top.visible {
   opacity: 1;
-  visibility: visible;
-}
-
-/* Ajuste cuando el panel de filtros está expandido */
-.filters-expanded .scroll-to-top {
-  right: 320px; /* 300px del panel + 20px de margen */
-}
-
-/* Hover effect */
-.scroll-to-top:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-/* Animación del ícono */
-.scroll-to-top:active {
-  transform: translateY(0);
 }
 </style>

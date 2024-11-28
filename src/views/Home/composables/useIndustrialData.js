@@ -1,5 +1,7 @@
 // composables/useIndustrialData.js
 import { ref, computed } from 'vue'
+import mockIndustrialData from '../../../mocks/industrialData'
+
 
 // Estado global compartido
 const state = {
@@ -18,61 +20,30 @@ const state = {
     sizeMax: null,
     region: '',
     currency: '',
-    useMetric: false
+    useMetric: false,
+    availabilityStatus: '',
+    availableFrom: null,
+    availableTo: null,
+    occupancyRate: null,
   })
 }
 
+// Helper functions
+const calculateSF = (buildings) => 
+  buildings.reduce((sum, b) => sum + (Number(b.buildingSizeSF) || 0), 0)
+
+const calculateOccupancyRate = (buildings) => {
+  const totalSF = calculateSF(buildings)
+  if (!totalSF) return 0
+  
+  const occupiedSF = buildings
+    .filter(b => b.status === 'Occupied')
+    .reduce((sum, b) => sum + (Number(b.buildingSizeSF) || 0), 0)
+  
+  return ((occupiedSF / totalSF) * 100).toFixed(1)
+}
+
 export const useIndustrialData = () => {
-  // Datos de prueba
-  const testData = [
-    {
-      id: 1,
-      buildingName: "Edificio A",
-      latitude: 25.6866,
-      longitude: -100.3161,
-      class: "A",
-      buildingSizeSF: 50000,
-      market: "Monterrey",
-      subMarket: "Centro",
-      type: "Industrial",
-      status: "Active"
-    },
-    {
-      id: 2,
-      buildingName: "Edificio B",
-      latitude: 25.6960,
-      longitude: -100.3208,
-      class: "B",
-      buildingSizeSF: 35000,
-      market: "Monterrey",
-      subMarket: "Norte",
-      type: "Warehouse",
-      status: "Under Construction"
-    }
-  ]
-
-  // Función para cargar datos
-  const loadData = async (initialData = null) => {
-    try {
-      state.loading.value = true
-      
-      if (initialData) {
-        state.buildingsDataRef.value = initialData
-      } else {
-        // Simulamos carga con datos de prueba
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        state.buildingsDataRef.value = testData
-      }
-      
-      state.dataInitialized.value = true
-    } catch (e) {
-      state.error.value = e
-      console.error('Error loading data:', e)
-    } finally {
-      state.loading.value = false
-    }
-  }
-
   // Datos filtrados
   const filteredData = computed(() => {
     return state.buildingsDataRef.value.filter(item => {
@@ -82,6 +53,16 @@ export const useIndustrialData = () => {
       const typeMatch = !state.filters.value.type || item.type === state.filters.value.type
       const dealMatch = !state.filters.value.deal || item.deal === state.filters.value.deal
       
+      // Filtro de disponibilidad
+      const availabilityMatch = !state.filters.value.availabilityStatus || 
+        item.status === state.filters.value.availabilityStatus
+
+      // Filtro de fechas
+      const dateMatch = (!state.filters.value.availableFrom || 
+        new Date(item.availableDate) >= new Date(state.filters.value.availableFrom)) &&
+        (!state.filters.value.availableTo || 
+        new Date(item.availableDate) <= new Date(state.filters.value.availableTo))
+
       // Filtro de tamaño
       const sizeMatch = (
         (!state.filters.value.sizeMin || item.buildingSizeSF >= state.filters.value.sizeMin) &&
@@ -93,37 +74,48 @@ export const useIndustrialData = () => {
              classMatch && 
              typeMatch && 
              dealMatch && 
-             sizeMatch
+             sizeMatch &&
+             availabilityMatch &&
+             dateMatch
     })
   })
 
-  // Estadísticas
-  const statistics = computed(() => ({
-    classA: {
-      count: filteredData.value.filter(b => b.class === 'A').length,
-      sf: filteredData.value
-        .filter(b => b.class === 'A')
-        .reduce((sum, b) => sum + (b.buildingSizeSF || 0), 0)
-    },
-    classB: {
-      count: filteredData.value.filter(b => b.class === 'B').length,
-      sf: filteredData.value
-        .filter(b => b.class === 'B')
-        .reduce((sum, b) => sum + (b.buildingSizeSF || 0), 0)
-    },
-    total: {
-      buildings: filteredData.value.length,
-      sf: filteredData.value.reduce((sum, b) => sum + (b.buildingSizeSF || 0), 0)
-    },
-    underConstruction: {
-      count: filteredData.value.filter(b => b.status === 'Under Construction').length,
-      sf: filteredData.value
-        .filter(b => b.status === 'Under Construction')
-        .reduce((sum, b) => sum + (b.buildingSizeSF || 0), 0)
-    }
-  }))
+  // Estadísticas calculadas
+  const statistics = computed(() => {
+    const filtered = filteredData.value
 
-  // Opciones de filtros
+    // Filtrar por clase y estado
+    const classABuildings = filtered.filter(b => b.class === 'A')
+    const classBBuildings = filtered.filter(b => b.class === 'B')
+    const underConstructionBuildings = filtered.filter(b => b.status === 'Under Construction')
+
+    return {
+      classA: {
+        count: classABuildings.length,
+        sf: calculateSF(classABuildings)
+      },
+      classB: {
+        count: classBBuildings.length,
+        sf: calculateSF(classBBuildings)
+      },
+      underConstruction: {
+        count: underConstructionBuildings.length,
+        sf: calculateSF(underConstructionBuildings)
+      },
+      total: {
+        buildings: filtered.length,
+        sf: calculateSF(filtered)
+      },
+      availability: {
+        available: filtered.filter(b => b.status === 'Available'),
+        occupied: filtered.filter(b => b.status === 'Occupied'),
+        futureAvailable: filtered.filter(b => b.status === 'Future Available'),
+        occupancyRate: calculateOccupancyRate(filtered)
+      }
+    }
+  })
+
+  // Opciones para los filtros
   const filterOptions = computed(() => {
     const createOptions = (values, includeAll = true) => {
       const options = Array.from(new Set(values.filter(Boolean)))
@@ -149,11 +141,7 @@ export const useIndustrialData = () => {
       classes: createOptions(state.buildingsDataRef.value.map(item => item.class)),
       types: createOptions(state.buildingsDataRef.value.map(item => item.type)),
       deals: createOptions(state.buildingsDataRef.value.map(item => item.deal)),
-      regions: createOptions(state.buildingsDataRef.value.map(item => item.region)),
-      currencies: [
-        { value: 'USD', label: 'USD' },
-        { value: 'MXN', label: 'MXN' }
-      ]
+      regions: createOptions(state.buildingsDataRef.value.map(item => item.region))
     }
   })
 
@@ -162,8 +150,8 @@ export const useIndustrialData = () => {
     filteredData.value.map(building => ({
       id: building.id,
       position: {
-        lat: building.latitude,
-        lng: building.longitude
+        lat: Number(building.latitude),
+        lng: Number(building.longitude)
       },
       properties: {
         name: building.buildingName,
@@ -173,6 +161,21 @@ export const useIndustrialData = () => {
       }
     }))
   )
+
+  // Función para cargar datos
+  const loadData = async (initialData = null) => {
+    try {
+      state.loading.value = true
+      // Usar datos mock si no se proporcionan datos iniciales
+      state.buildingsDataRef.value = initialData || mockIndustrialData
+      state.dataInitialized.value = true
+    } catch (error) {
+      state.error.value = error
+      console.error('Error loading data:', error)
+    } finally {
+      state.loading.value = false
+    }
+  }
 
   // Reset filtros
   const resetFilters = () => {
@@ -187,14 +190,12 @@ export const useIndustrialData = () => {
       sizeMax: null,
       region: '',
       currency: 'USD',
-      useMetric: false
+      useMetric: false,
+      availabilityStatus: '',
+      availableFrom: null,
+      availableTo: null,
+      occupancyRate: null,
     }
-  }
-
-  // Función para aplicar filtros (si necesitas lógica adicional)
-  const applyFilters = () => {
-    // Aquí puedes agregar lógica adicional antes de aplicar los filtros
-    console.log('Applying filters:', state.filters.value)
   }
 
   return {
@@ -202,8 +203,7 @@ export const useIndustrialData = () => {
     loading: state.loading,
     error: state.error,
     filters: state.filters,
-    dataInitialized: state.dataInitialized,
-
+    
     // Datos computados
     filteredData,
     statistics,
@@ -212,7 +212,6 @@ export const useIndustrialData = () => {
 
     // Métodos
     loadData,
-    resetFilters,
-    applyFilters
+    resetFilters
   }
 }

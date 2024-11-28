@@ -1,101 +1,74 @@
+<template>
+  <CCard class="mb-4">
+    <CCardHeader>
+      <strong>Industrial Listings</strong>
+    </CCardHeader>
+    <CCardBody>
+      <CTable striped hover responsive>
+        <CTableHead>
+          <CTableRow>
+            <CTableHeaderCell>Building Name</CTableHeaderCell>
+            <CTableHeaderCell>Market</CTableHeaderCell>
+            <CTableHeaderCell>Submarket</CTableHeaderCell>
+            <CTableHeaderCell>Class</CTableHeaderCell>
+            <CTableHeaderCell>Type</CTableHeaderCell>
+            <CTableHeaderCell>Size (SF)</CTableHeaderCell>
+            <CTableHeaderCell>Status</CTableHeaderCell>
+            <CTableHeaderCell>Available Date</CTableHeaderCell>
+          </CTableRow>
+        </CTableHead>
+        <CTableBody>
+          <CTableRow v-for="building in buildingsData" :key="building.id">
+            <CTableDataCell>{{ building.buildingName }}</CTableDataCell>
+            <CTableDataCell>{{ building.market }}</CTableDataCell>
+            <CTableDataCell>{{ building.subMarket }}</CTableDataCell>
+            <CTableDataCell>{{ building.class }}</CTableDataCell>
+            <CTableDataCell>{{ building.type }}</CTableDataCell>
+            <CTableDataCell>{{ building.buildingSizeSF.toLocaleString() }}</CTableDataCell>
+            <CTableDataCell>
+              <CBadge :color="getStatusColor(building.status)">
+                {{ building.status }}
+              </CBadge>
+            </CTableDataCell>
+            <CTableDataCell>{{ formatDate(building.availableDate) }}</CTableDataCell>
+          </CTableRow>
+        </CTableBody>
+      </CTable>
+    </CCardBody>
+  </CCard>
+</template>
+
 <script setup>
-import { useTableFilters } from '../composables/useTableFilters'
-import buildingsDataOriginal from '../_data'
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
+import { useIndustrialData } from '../composables/useIndustrialData'
+import {
+  CCard,
+  CCardHeader,
+  CCardBody,
+  CTable,
+  CTableHead,
+  CTableBody,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+  CBadge
+} from '@coreui/vue-pro'
 
-// Estado para selección
-const selected = ref([])
+const { filteredData } = useIndustrialData()
 
-// Convertir buildingsDataOriginal a ref
-const buildingsDataRef = ref(buildingsDataOriginal)
+const buildingsData = computed(() => filteredData.value)
 
-// Para debug
-onMounted(() => {
-  console.log('Datos originales:', buildingsDataOriginal)
-  console.log('Datos filtrados:', filteredData.value)
-  console.log('Datos de la tabla:', buildingsData.value)
-})
-
-// Usar el composable de filtros
-const {
-  filters,
-  filteredData,
-  resetFilters,
-  marketOptions,
-  submarketOptions,
-  classOptions,
-  stats
-} = useTableFilters(buildingsDataRef)
-
-
-// Actualizar buildingsData para usar los datos filtrados
-const buildingsData = computed(() =>
-  filteredData.value.map((item) => ({
-    ...item,
-    _selected: selected.value.includes(item.id),
-  }))
-)
-
-const check = (event, id) => {
-  if (event.target.checked) {
-    selected.value = [...selected.value, id]
-  } else {
-    selected.value = selected.value.filter((itemId) => itemId !== id)
+const getStatusColor = (status) => {
+  const colors = {
+    'Available': 'success',
+    'Occupied': 'danger',
+    'Under Construction': 'warning',
+    'Future Available': 'info'
   }
+  return colors[status] || 'secondary'
+}
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString()
 }
 </script>
-<template>
-  <CRow class="mb-5">
-    <CCol :md="12">
-        <h2>INDUSTRAL LISTINGS</h2>
-    </CCol>
-    <CCol :md="12">
-        <CCard>
-            <CCardBody>
-                <CRow class="mb-3">
-                    <CCol :md="2">
-                        <CFormCheck :button="{ color: 'primary', variant: 'outline' }" type="radio" name="options" id="option1" autocomplete="off" label="AVAILABILITY BUILDINGS" checked/>
-                    </CCol>
-                    <CCol :md="2">
-                        <CFormCheck :button="{ color: 'primary', variant: 'outline' }" type="radio" name="options" id="option2" autocomplete="off" label="ABSORPION BUINDINGS"/>
-                    </CCol>
-                    <CCol :md="2">
-                        <CFormCheck :button="{ color: 'primary', variant: 'outline' }" type="radio" name="options" id="option3" autocomplete="off" label="AVAILABLE LAND"/>
-                    </CCol>
-                    <CCol :md="6">
-                        <CFormCheck :button="{ color: 'primary', variant: 'outline' }" type="radio" name="options" id="option4" autocomplete="off" label="CAM"/>
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CSmartTable
-                        :items="buildingsData"
-                        :columns="columns"
-                        column-filter
-
-                        :items-per-page="5"
-                        column-sorter
-                        pagination
-                        :table-props="{
-                        responsive: true,
-                        striped: true,
-                        hover: true,
-                        small: true,
-                        }"
-                        class="custom-table"
-                    >
-                        <template #select="{ item }">
-                        <td class="py-2">
-                            <CFormCheck
-                            :id="'checkbox-' + item.id"
-                            :checked="item._selected"
-                            @change="(event) => check(event, item.id)"
-                            />
-                        </td>
-                        </template>
-                    </CSmartTable>
-                </CRow>
-            </CCardBody>
-        </CCard>
-    </CCol>
-</CRow>
-</template>
