@@ -25,7 +25,9 @@ const state = {
     availableFrom: null,
     availableTo: null,
     occupancyRate: null,
-  })
+  }),
+  selectedRows: ref([]),
+  hiddenRows: ref([])
 }
 
 // Helper functions
@@ -212,6 +214,26 @@ export const useIndustrialData = () => {
 
     // Métodos
     loadData,
-    resetFilters
+    resetFilters,
+    selectedRows: state.selectedRows,
+    hiddenRows: state.hiddenRows,
+    
+    toggleRowSelection: (id) => {
+      const index = state.selectedRows.value.indexOf(id)
+      if (index === -1) {
+        state.selectedRows.value.push(id)
+      } else {
+        state.selectedRows.value.splice(index, 1)
+      }
+    },
+    
+    toggleRowHidden: (id) => {
+      const index = state.hiddenRows.value.indexOf(id)
+      if (index === -1) {
+        state.hiddenRows.value.push(id)
+      } else {
+        state.hiddenRows.value.splice(index, 1)
+      }
+    }
   }
 }

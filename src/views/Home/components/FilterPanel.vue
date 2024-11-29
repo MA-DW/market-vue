@@ -92,7 +92,6 @@ const { filters, filterOptions, resetFilters } = useIndustrialData()
 .filter-panel {
   padding: 1rem;
   background: white;
-  border-left: 1px solid #dee2e6;
   height: 100%;
   overflow-y: auto;
 }

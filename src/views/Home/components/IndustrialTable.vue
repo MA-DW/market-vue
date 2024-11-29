@@ -1,55 +1,48 @@
 <template>
-  <CCard class="mb-4">
-    <CCardHeader>
-      <strong>Industrial Listings</strong>
-    </CCardHeader>
-    <CCardBody>
-      <div class="table-responsive">
-        <CTable hover>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell>
-                <input 
-                  type="checkbox" 
-                  :checked="allSelected"
-                  @change="toggleAllSelection"
-                />
-              </CTableHeaderCell>
-              <CTableHeaderCell>Hide</CTableHeaderCell>
-              <CTableHeaderCell v-for="column in columns" :key="column.field">
-                {{ column.label }}
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            <CTableRow 
-              v-for="building in buildingsData" 
-              :key="building.id"
-              :class="{ 'table-secondary': isRowHidden(building.id) }"
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>
+            <input 
+              type="checkbox" 
+              :checked="allSelected"
+              @change="toggleAllSelection"
             >
-              <CTableDataCell>
-                <input 
-                  type="checkbox"
-                  :checked="isRowSelected(building.id)"
-                  @change="() => toggleRowSelection(building.id)"
-                />
-              </CTableDataCell>
-              <CTableDataCell>
-                <input 
-                  type="checkbox"
-                  :checked="isRowHidden(building.id)"
-                  @change="() => toggleRowHidden(building.id)"
-                />
-              </CTableDataCell>
-              <CTableDataCell v-for="column in columns" :key="column.field">
-                {{ formatValue(building[column.field], column.type) }}
-              </CTableDataCell>
-            </CTableRow>
-          </CTableBody>
-        </CTable>
-      </div>
-    </CCardBody>
-  </CCard>
+          </th>
+          <th>Hide</th>
+          <th v-for="column in visibleColumns" :key="column.field">
+            {{ column.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          v-for="row in filteredData" 
+          :key="row.id"
+          :class="{ 'table-secondary': isHidden(row.id) }"
+        >
+          <td>
+            <input 
+              type="checkbox"
+              :checked="isSelected(row.id)"
+              @change="toggleSelection(row.id)"
+            >
+          </td>
+          <td>
+            <input 
+              type="checkbox"
+              :checked="isHidden(row.id)"
+              @change="toggleHidden(row.id)"
+            >
+          </td>
+          <td v-for="column in visibleColumns" :key="column.field">
+            {{ formatValue(row[column.field], column.type) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup>
@@ -61,7 +54,7 @@ const {
   selectedRows, 
   hiddenRows,
   toggleRowSelection,
-  toggleRowHidden 
+  toggleRowHidden
 } = useIndustrialData()
 
 const columns = [
@@ -97,21 +90,24 @@ const columns = [
   { field: 'email', label: 'EMAIL', type: 'text' }
 ]
 
-const buildingsData = computed(() => filteredData.value)
+const visibleColumns = computed(() => columns)
 
 const allSelected = computed(() => 
-  buildingsData.value.length > 0 && 
-  buildingsData.value.every(row => selectedRows.value.includes(row.id))
+  filteredData.value.length > 0 && 
+  filteredData.value.every(row => selectedRows.value.includes(row.id))
 )
 
-const isRowSelected = (id) => selectedRows.value.includes(id)
-const isRowHidden = (id) => hiddenRows.value.includes(id)
+const isSelected = (id) => selectedRows.value.includes(id)
+const isHidden = (id) => hiddenRows.value.includes(id)
+
+const toggleSelection = (id) => toggleRowSelection(id)
+const toggleHidden = (id) => toggleRowHidden(id)
 
 const toggleAllSelection = () => {
   if (allSelected.value) {
     selectedRows.value = []
   } else {
-    selectedRows.value = buildingsData.value.map(row => row.id)
+    selectedRows.value = filteredData.value.map(row => row.id)
   }
 }
 
@@ -128,3 +124,18 @@ const formatValue = (value, type) => {
   }
 }
 </script>
+
+<style scoped>
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table th {
+  white-space: nowrap;
+  background-color: #f8f9fa;
+}
+
+.table td {
+  white-space: nowrap;
+}
+</style> 
