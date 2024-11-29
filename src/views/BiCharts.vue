@@ -7,4 +7,5 @@
   path: '/BI CHARTS',
   name: 'bi-charts',
   component: () => import('@/views/BiCharts.vue')
+  
 } 
