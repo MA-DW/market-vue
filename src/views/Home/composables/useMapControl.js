@@ -8,6 +8,7 @@ export const useMapControl = (mapData) => {
   let markers = []
   let layerControl = null
   const isLayerControlVisible = ref(false)
+  let formas = []
 
   const initializeMap = () => {
     if (!mapRef.value) return
