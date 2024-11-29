@@ -32,6 +32,7 @@ const progressGroupExample1 = computed(() => [
   { title: t('sunday'), value1: 9, value2: 69 },
 ])
 
+
 const progressGroupExample2 = computed(() => [
   { title: t('male'), icon: 'cil-user', value: 53 },
   { title: t('female'), icon: 'cil-user-female', value: 43 },
