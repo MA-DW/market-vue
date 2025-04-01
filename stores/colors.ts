@@ -1,7 +1,7 @@
 export const useColorStore = defineStore("colorStore", {
   state: () => ({
-    primary: "",
-    secondary: "",
+    primary: "154, 148, 148",
+    secondary: "216, 211, 211",
   }),
   actions: {
     async fetchColors() {
