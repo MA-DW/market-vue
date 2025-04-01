@@ -2,28 +2,22 @@
 export default {
   content: [],
   theme: {
-    fontFamily: {
-      sans: ["Calibri", "inter", "sans-serif"],
-    },
     extend: {
-      fontFamily: {
-        mermerize: ["mesmerize", "sans-serif"],
-      },
       colors: {
-        primary: "#165788",
-        "primary-300": "#8babc3",
-        "primary-200": "#d0dde7",
-        "primary-100": "#e8eef3",
+        primary: "rgba(var(--color-primary), 1)",
+        "primary-100": "rgba(var(--color-primary), .1)",
+        "primary-200": "rgba(var(--color-primary), .2)",
+        "primary-300": "rgba(var(--color-primary), .5)",
 
-        secondary: "#1C75BC",
-        "secondary-300": "#8dbadd",
-        "secondary-200": "#d2e3f2",
-        "secondary-100": "#e8f1f8",
+        secondary: "rgba(var(--color-secondary), 1)",
+        "secondary-100": "rgba(var(--color-secondary), .1)",
+        "secondary-200": "rgba(var(--color-secondary), .2)",
+        "secondary-300": "rgba(var(--color-secondary), .5)",
 
-        terciary: "#00AEEF",
-        "terciary-300": "#80d7f7",
-        "terciary-200": "#cceffc",
-        "terciary-100": "#e5f7fd",
+        terciary: "rgba(28,117,188, 1)",
+        "terciary-100": "rgba(28,117,188, .1)",
+        "terciary-200": "rgba(28,117,188, .2)",
+        "terciary-300": "rgba(28,117,188, .5)",
 
         oscuro: "#403F41",
         "oscuro-300": "#67707A",
@@ -39,6 +33,13 @@ export default {
         //disabled es el oscuro-200
         "disable-100": "#c0c4ca",
       },
+      fontSize: {
+        "2.5xl": "22px",
+      },
+    },
+    fontFamily: {
+      calibri: ["Calibril", "sans"],
+      mesmerize: ["Mesmerize", "sans-serif"],
     },
   },
   plugins: [],

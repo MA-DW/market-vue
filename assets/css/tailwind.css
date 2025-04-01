@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 154, 148, 148;
+    --color-secondary: 216, 211, 211;
+  }
+
+  @font-face {
+    font-family: 'Calibril';
+    src: url('/fonts/calibril.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Mesmerize';
+    src: url('/fonts/Mesmerize_Ul.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  h1 {
+    @apply text-4xl font-bold;
+    font-family: 'Mesmerize';
+  }
+  h2 {
+    @apply font-bold;
+    font-size: 32px;
+  }
+  h3 {
+    @apply font-bold text-2xl;
+  }
+}
