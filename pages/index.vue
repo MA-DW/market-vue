@@ -1,6 +1,30 @@
 <template>
   <div class="">
-    <h1>Colores</h1>
+    <h1>Componentes</h1>
+    
+    <div class="mb-8">
+      <h2 class="mb-4">Select</h2>
+      <div class="max-w-xs space-y-4">
+        <UikitSelect
+          v-model="selectedValue"
+          :data="selectData"
+          label="Select normal"
+          name="normal-select"
+          empty="Select"
+        />
+
+        <UikitSelect
+          v-model="selectedOption2"
+          :data="selectData"
+          label="Select deshabilitado"
+          name="disabled-select"
+          empty="No puede seleccionar"
+          disabled
+        />
+      </div>
+    </div>
+
+    <h2>Colores</h2>
     <div>Primary</div>
     <div class="flex">
       <div class="w-14 h-6 bg-primary"></div>
@@ -184,3 +208,18 @@
   </div>
 
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const selectedValue = ref(null)
+const selectedOption2 = ref(null)
+const selectData = [
+  { label: 'Opcion 01', value: '01' },
+  { label: 'Opcion 02', value: '02' },
+  { label: 'Opcion 03', value: '03' },
+  { label: 'Opcion 04', value: '04' },
+  { label: 'Opcion 05', value: '05' },
+  { label: 'Opcion 06', value: '06' },
+]
+</script>
