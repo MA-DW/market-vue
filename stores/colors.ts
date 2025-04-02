@@ -12,7 +12,7 @@ export const useColorStore = defineStore("colorStore", {
               primary: "22, 87, 136",
               secondary: "0, 174 ,239",
             });
-          }, 2000);
+          }, 1000);
         }
       );
       this.primary = data.primary;
