@@ -28,6 +28,8 @@ import { UikitIcon } from '#components';
     <UikitIcon name="market-report"></UikitIcon>
 
     <UikitIcon name="market-report" color="red"></UikitIcon>
+    <UikitIcon name="password-off-field"></UikitIcon>
+    <UikitIcon name="password-on-field"></UikitIcon>
 
   </div>
 </template>
