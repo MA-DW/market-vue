@@ -2,27 +2,33 @@
 import { computed } from 'vue';
 
 interface InputProps {
-  modelValue?: string;
-  label?: string;
-  name?: string;
-  type?: string;
-  placeholder?: string;
-  error?: string;
+  // Required props
+  modelValue: string | number; // value
+  label: string;
+  name: string;
+  // Optional props
+  type?: 'text' | 'number';
   disabled?: boolean;
+  error?: string;
 }
 
-const props = defineProps<InputProps>();
+const props = withDefaults(defineProps<InputProps>(), {
+  type: 'text',
+  disabled: false
+});
+
 const emit = defineEmits(['update:modelValue']);
 
 const updateValue = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  emit('update:modelValue', target.value);
+  const value = props.type === 'number' ? Number(target.value) : target.value;
+  emit('update:modelValue', value);
 };
 
 const baseClasses = 'relative w-full font-normal text-base';
 const labelClasses = 'block mb-1 text-sm font-medium text-oscuro';
 const inputClasses = computed(() => [
-  // Base classes siempre presentes
+  // Base classes
   'w-full h-[40px] px-3 rounded transition-all duration-200 focus:outline-none',
   
   // Estados específicos
@@ -42,7 +48,6 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 <template>
   <div :class="baseClasses">
     <label 
-      v-if="label" 
       :for="name"
       :class="labelClasses"
     >
@@ -52,9 +57,9 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
     <div class="relative">
       <input
         :id="name"
-        :type="type || 'text'"
+        :name="name"
+        :type="type"
         :value="modelValue"
-        :placeholder="placeholder"
         :disabled="disabled"
         :class="inputClasses"
         @input="updateValue"

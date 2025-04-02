@@ -5,33 +5,34 @@
     <div class="mb-8">
       <h2 class="mb-4">Input</h2>
       <div class="max-w-xs space-y-4">
+        <!-- Input de texto básico -->
         <UikitInput
-          v-model="inputValue1"
-          label="Normal input"
-          name="normal-input"
-          placeholder="Write your text here"
+          v-model="textValue"
+          label="Text input"
+          name="text-input"
         />
 
+        <!-- Input numérico -->
         <UikitInput
-          v-model="inputValue2"
-          label="Input with value"
-          name="filled-input"
-          placeholder="Write your text here"
+          v-model="numberValue"
+          label="Number input"
+          name="number-input"
+          type="number"
         />
 
+        <!-- Input with error -->
         <UikitInput
-          v-model="inputValue3"
+          v-model="errorValue"
           label="Input with error"
           name="error-input"
-          placeholder="Write your text here"
           error="This field is required"
         />
 
+        <!-- Disabled input -->
         <UikitInput
-          v-model="inputValue4"
+          v-model="disabledValue"
           label="Disabled input"
           name="disabled-input"
-          placeholder="Cannot write here"
           disabled
         />
       </div>
@@ -247,10 +248,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const inputValue1 = ref('')
-const inputValue2 = ref('This input has a value')
-const inputValue3 = ref('')
-const inputValue4 = ref('Disabled value')
+// Input values
+const textValue = ref('')
+const numberValue = ref(0)
+const errorValue = ref('')
+const disabledValue = ref('Disabled value')
 
 const selectedValue = ref(null)
 const selectedOption2 = ref(null)
