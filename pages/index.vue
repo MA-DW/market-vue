@@ -1,37 +1,37 @@
 <template>
   <div class="">
-    <h1>Componentes</h1>
+    <h1>Components</h1>
     
     <div class="mb-8">
       <h2 class="mb-4">Input</h2>
       <div class="max-w-xs space-y-4">
         <UikitInput
           v-model="inputValue1"
-          label="Input normal"
+          label="Normal input"
           name="normal-input"
           placeholder="Write your text here"
         />
 
         <UikitInput
           v-model="inputValue2"
-          label="Input con valor"
+          label="Input with value"
           name="filled-input"
           placeholder="Write your text here"
         />
 
         <UikitInput
           v-model="inputValue3"
-          label="Input con error"
+          label="Input with error"
           name="error-input"
           placeholder="Write your text here"
-          error="Este campo es requerido"
+          error="This field is required"
         />
 
         <UikitInput
           v-model="inputValue4"
-          label="Input deshabilitado"
+          label="Disabled input"
           name="disabled-input"
-          placeholder="No puede escribir"
+          placeholder="Cannot write here"
           disabled
         />
       </div>
@@ -43,23 +43,23 @@
         <UikitSelect
           v-model="selectedValue"
           :data="selectData"
-          label="Select normal"
+          label="Normal select"
           name="normal-select"
-          empty="Select"
+          empty="Select an option"
         />
 
         <UikitSelect
           v-model="selectedOption2"
           :data="selectData"
-          label="Select deshabilitado"
+          label="Disabled select"
           name="disabled-select"
-          empty="No puede seleccionar"
+          empty="Cannot select"
           disabled
         />
       </div>
     </div>
 
-    <h2>Colores</h2>
+    <h2>Colors</h2>
     <div>Primary</div>
     <div class="flex">
       <div class="w-14 h-6 bg-primary"></div>
@@ -248,18 +248,18 @@
 import { ref } from 'vue'
 
 const inputValue1 = ref('')
-const inputValue2 = ref('Este input tiene valor')
+const inputValue2 = ref('This input has a value')
 const inputValue3 = ref('')
-const inputValue4 = ref('Valor deshabilitado')
+const inputValue4 = ref('Disabled value')
 
 const selectedValue = ref(null)
 const selectedOption2 = ref(null)
 const selectData = [
-  { label: 'Opcion 01', value: '01' },
-  { label: 'Opcion 02', value: '02' },
-  { label: 'Opcion 03', value: '03' },
-  { label: 'Opcion 04', value: '04' },
-  { label: 'Opcion 05', value: '05' },
-  { label: 'Opcion 06', value: '06' },
+  { label: 'Option 01', value: '01' },
+  { label: 'Option 02', value: '02' },
+  { label: 'Option 03', value: '03' },
+  { label: 'Option 04', value: '04' },
+  { label: 'Option 05', value: '05' },
+  { label: 'Option 06', value: '06' },
 ]
 </script>
