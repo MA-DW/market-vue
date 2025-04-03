@@ -32,6 +32,11 @@ const selectOption = (option: Option) => {
   isOpen.value = false;
 };
 
+const clearSelection = (event: Event) => {
+  event.stopPropagation();
+  emit('update:modelValue', null);
+};
+
 const baseClasses = 'relative w-full font-normal text-base';
 const labelClasses = 'block mb-1 text-sm font-medium text-oscuro';
 const triggerClasses = computed(() => [
@@ -47,6 +52,7 @@ const triggerClasses = computed(() => [
 
 const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
+const clearButtonClasses = 'absolute right-8 top-1/2 p-1 hover:bg-secondary-100 rounded-full transition-colors duration-200';
 </script>
 
 <template>
@@ -60,16 +66,35 @@ const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
       <span>
         {{ selectedOption?.label || empty || 'Seleccione una opción' }}
       </span>
-      <svg 
-        class="w-5 h-5"
-        :class="{ 'transform rotate-180': isOpen }"
-        xmlns="http://www.w3.org/2000/svg" 
-        fill="none" 
-        viewBox="0 0 24 24" 
-        stroke="currentColor"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
+      <div class="flex items-center">
+        <button 
+          v-if="selectedOption && !disabled"
+          type="button"
+          :class="clearButtonClasses"
+          @click="clearSelection"
+          title="Limpiar selección"
+        >
+          <svg 
+            class="w-4 h-4 text-oscuro-300"
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <svg 
+          class="w-5 h-5"
+          :class="{ 'transform rotate-180': isOpen }"
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
     </div>
 
     <div 
