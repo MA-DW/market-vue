@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import { UikitButton } from '#components';
+import { ref } from 'vue'
 
+// Input values
+const textValue = ref('')
+const numberValue = ref(0)
+const errorValue = ref('')
+const disabledValue = ref('Disabled value')
+
+const selectedValue = ref(null)
+const selectedOption2 = ref(null)
+const selectData = [
+  { label: 'Option 01', value: '01' },
+  { label: 'Option 02', value: '02' },
+  { label: 'Option 03', value: '03' },
+  { label: 'Option 04', value: '04' },
+  { label: 'Option 05', value: '05' },
+  { label: 'Option 06', value: '06' },
+]
 </script>
 <template>
   <div class="">
@@ -214,24 +231,3 @@ import { UikitButton } from '#components';
   </div>
 
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-
-// Input values
-const textValue = ref('')
-const numberValue = ref(0)
-const errorValue = ref('')
-const disabledValue = ref('Disabled value')
-
-const selectedValue = ref(null)
-const selectedOption2 = ref(null)
-const selectData = [
-  { label: 'Option 01', value: '01' },
-  { label: 'Option 02', value: '02' },
-  { label: 'Option 03', value: '03' },
-  { label: 'Option 04', value: '04' },
-  { label: 'Option 05', value: '05' },
-  { label: 'Option 06', value: '06' },
-]
-</script>
