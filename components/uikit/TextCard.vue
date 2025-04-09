@@ -1,8 +1,8 @@
 <script setup lang="ts">
 interface TextCardProps {
-  title: string;
-  headerText?: string;
-  description?: string;
+  totalNumber: string;
+  headerText: string;
+  totalSum: string;
 }
 
 const props = defineProps<TextCardProps>();
@@ -11,12 +11,12 @@ const props = defineProps<TextCardProps>();
 <template>
   <div class="text-card">
     <div class="text-card-number">
-      {{ title }}
+      {{ totalNumber }}
     </div>
     <div class="text-card-content">
       <div class="text-card-text">
-        <span class="text-card-header">{{ headerText || 'Card title/name/header' }}</span>
-        <span class="text-card-description">{{ description || '000,000,000' }}</span>
+        <span class="text-card-header">{{ headerText }}</span>
+        <span class="text-card-description">{{ totalSum }}</span>
       </div>
     </div>
   </div>
@@ -59,5 +59,6 @@ const props = defineProps<TextCardProps>();
 .text-card-description {
   font-size: 16px;
   color: #000000;
+  font-weight: bold;
 }
 </style> 

@@ -3,19 +3,19 @@ import { ref } from 'vue'
 
 const cardData = ref([
   {
-    title: '000',
+    totalNumber: '000',
     headerText: 'Card title/name/header',
-    description: '000,000,000'
+    totalSum: '000,000,000'
   },
   {
-    title: '000',
+    totalNumber: '000',
     headerText: 'Card title/name/header',
-    description: '000,000,000'
+    totalSum: '000,000,000'
   },
   {
-    title: '000',
+    totalNumber: '000',
     headerText: 'Card title/name/header',
-    description: '000,000,000'
+    totalSum: '000,000,000'
   }
 ])
 </script>
@@ -27,9 +27,9 @@ const cardData = ref([
       <UikitTextCard
         v-for="(card, index) in cardData"
         :key="index"
-        :title="card.title"
+        :total-number="card.totalNumber"
         :header-text="card.headerText"
-        :description="card.description"
+        :total-sum="card.totalSum"
       />
     </div>
   </div>
