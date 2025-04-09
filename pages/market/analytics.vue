@@ -1,5 +1,5 @@
 <template>
   <div>
-    Home
+    analytics
   </div>
 </template>

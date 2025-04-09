@@ -1,5 +1,5 @@
 <template>
   <div>
-    Home
+    reit
   </div>
 </template>
