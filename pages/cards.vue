@@ -3,19 +3,19 @@ import { ref } from 'vue'
 
 const cardData = ref([
   {
-    header: 'Card',
     title: '000',
-    subtitle: 'title/name/header'
+    headerText: 'Card title/name/header',
+    description: '000,000,000'
   },
   {
-    header: 'Card',
-    title: '000,000,000',
-    subtitle: 'subtitle/description'
+    title: '000',
+    headerText: 'Card title/name/header',
+    description: '000,000,000'
   },
   {
-    header: 'Card',
     title: '000',
-    subtitle: 'footer/additional info'
+    headerText: 'Card title/name/header',
+    description: '000,000,000'
   }
 ])
 </script>
@@ -27,9 +27,9 @@ const cardData = ref([
       <UikitTextCard
         v-for="(card, index) in cardData"
         :key="index"
-        :header="card.header"
         :title="card.title"
-        :subtitle="card.subtitle"
+        :header-text="card.headerText"
+        :description="card.description"
       />
     </div>
   </div>
