@@ -1,11 +1,11 @@
 <script setup lang="ts">
-interface TextCardProps {
+interface Text_Card_lgProps {
   totalNumber: string;
   headerText: string;
   totalSum: string;
 }
 
-const props = defineProps<TextCardProps>();
+const props = defineProps<Text_Card_lgProps>();
 </script>
 
 <template>
