@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { UikitButton } from '#components';
-
-</script>
 <template>
   <div class="">
     <h1>Components</h1>
