@@ -1,11 +1,25 @@
+<script lang="ts" setup>
+const isCollapsed = ref(false)
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value;
+}
+provide('isCollapsed', isCollapsed);
+provide('toggleCollapse', toggleCollapse);
+
+const showOverlay = ref(false)
+</script>
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Navbar superior -->
-    <Navbar />
+    <Navbar v-model:showOverlay="showOverlay" />
 
-    <div class="flex flex-1">
+    <div class="flex flex-1 relative">
+      <div
+        v-if="showOverlay"
+        class="absolute inset-0 bg-black/40 z-40 cursor-default"
+      ></div>
       <!-- Sidebar -->
-      <Sidebar class="w-72" />
+      <Sidebar />
 
       <!-- Contenido principal -->
       <div class="flex flex-1 flex-col">
