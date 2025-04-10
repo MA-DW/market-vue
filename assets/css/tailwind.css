@@ -34,3 +34,9 @@
     @apply font-bold text-2xl;
   }
 }
+
+@layer utilities {
+  .clip-diagonal {
+    clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}

@@ -1,5 +1,5 @@
 <template>
   <div>
-    Home
+    option 1
   </div>
 </template>
