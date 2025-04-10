@@ -69,6 +69,7 @@ const multiSelectedDisabled = ref(['02', '03'])
         name="multi-normal-select"
         empty="Seleccione opciones"
         multiple
+        show-select-all
       />
 
       <!-- Multi-select con error -->
@@ -80,6 +81,7 @@ const multiSelectedDisabled = ref(['02', '03'])
         empty="Seleccione opciones"
         error="Debe seleccionar al menos una opción"
         multiple
+        show-select-all
       />
 
       <!-- Multi-select deshabilitado -->
@@ -91,6 +93,18 @@ const multiSelectedDisabled = ref(['02', '03'])
         empty="No puede seleccionar"
         disabled
         multiple
+        show-select-all
+      />
+
+      <!-- Multi-select con seleccionar todos -->
+      <UikitSelect
+        v-model="multiSelectedValue"
+        :data="selectData"
+        label="Multi-select con seleccionar todos"
+        name="multi-select-all"
+        empty="Seleccione opciones"
+        multiple
+        show-select-all
       />
     </div>
   </div>
