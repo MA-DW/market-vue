@@ -57,6 +57,25 @@
           empty="Cannot select"
           disabled
         />
+
+        <div class="p-5 bg-primary">
+          <UikitSelect
+            v-model="selectedValue"
+            :data="selectData"
+            label="Normal select"
+            name="normal-select"
+            empty="Select an option"
+          />
+
+          <UikitSelect
+            v-model="selectedOption2"
+            :data="selectData"
+            label="Disabled select"
+            name="disabled-select"
+            empty="Cannot select"
+            disabled
+          />
+        </div>
       </div>
     </div>
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core';
 import { ref, computed } from 'vue';
 
 interface Option {
@@ -15,6 +16,11 @@ interface SelectProps {
   disabled?: boolean;
 }
 
+const dropdownRef = ref(null)
+onClickOutside(dropdownRef, () => {
+  isOpen.value = false
+})
+
 const props = defineProps<SelectProps>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -22,9 +28,9 @@ const isOpen = ref(false);
 const selectedOption = computed(() => props.data.find(opt => opt.value === props.modelValue));
 
 const toggleSelect = () => {
-  if (!props.disabled) {
+  // if (!props.disabled) {
     isOpen.value = !isOpen.value;
-  }
+  // }
 };
 
 const selectOption = (option: Option) => {
@@ -41,7 +47,7 @@ const baseClasses = 'relative w-full font-normal text-base';
 const labelClasses = 'block mb-1 text-sm font-medium text-oscuro';
 const triggerClasses = computed(() => [
   'w-full h-[40px] px-3 flex items-center justify-between rounded',
-  'border transition-all duration-200',
+  'border transition-all duration-200 bg-white',
   isOpen.value 
     ? 'border-[#00AEEF] border-[1.5px] shadow-select-open' 
     : 'border-[#838F9E] border-opacity-40 border',
@@ -50,7 +56,7 @@ const triggerClasses = computed(() => [
     : 'cursor-pointer'
 ]);
 
-const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50';
+const dropdownClasses = 'absolute w-full mt-1 bg-white shadow-[0_8px_16px_0_rgba(0,0,0,.15)] rounded-md shadow-md z-50';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
 const clearButtonClasses = 'absolute right-8 top-1/2 p-1 hover:bg-secondary-100 rounded-full transition-colors duration-200';
 </script>
@@ -62,6 +68,7 @@ const clearButtonClasses = 'absolute right-8 top-1/2 p-1 hover:bg-secondary-100 
       :id="name"
       :class="triggerClasses"
       @click="toggleSelect"
+      ref="dropdownRef"
     >
       <span>
         {{ selectedOption?.label || empty || 'Seleccione una opción' }}
@@ -110,7 +117,7 @@ const clearButtonClasses = 'absolute right-8 top-1/2 p-1 hover:bg-secondary-100 
         ]"
         @click="selectOption(option)"
       >
-        {{ option.label }}
+        <span class="text-[#67707A]">{{ option.label }}</span>
       </div>
     </div>
   </div>

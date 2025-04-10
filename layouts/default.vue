@@ -22,12 +22,12 @@ const showOverlay = ref(false)
       <Sidebar />
 
       <!-- Contenido principal -->
-      <div class="flex flex-1 flex-col">
+      <div class="flex flex-1 flex-col bg-[#F9F9FA]">
         <main class="flex-1 p-6 relative ">
           <slot />
-          <div
+          <!-- <div
             class="absolute bottom-0 left-0 w-full h-1/3 bg-[url('/assets/images/background.png')] bg-no-repeat bg-cover bg-center pointer-events-none"
-          ></div>
+          ></div> -->
         </main>
         <!-- Footer -->
         <Footer />
