@@ -1,61 +1,39 @@
-<script setup lang="ts">
-import { UikitButton } from '#components';
-import { ref } from 'vue'
-
-// Input values
-const textValue = ref('')
-const numberValue = ref(0)
-const errorValue = ref('')
-const disabledValue = ref('Disabled value')
-
-const selectedValue = ref(null)
-const selectedOption2 = ref(null)
-const selectData = [
-  { label: 'Option 01', value: '01' },
-  { label: 'Option 02', value: '02' },
-  { label: 'Option 03', value: '03' },
-  { label: 'Option 04', value: '04' },
-  { label: 'Option 05', value: '05' },
-  { label: 'Option 06', value: '06' },
-]
-</script>
-
 <template>
   <div class="">
     <h1>Components</h1>
-
+    
     <div class="mb-8">
       <h2 class="mb-4">Input</h2>
       <div class="max-w-xs space-y-4">
         <!-- Input de texto básico -->
         <UikitInput
-            v-model="textValue"
-            label="Text input"
-            name="text-input"
+          v-model="textValue"
+          label="Text input"
+          name="text-input"
         />
 
         <!-- Input numérico -->
         <UikitInput
-            v-model="numberValue"
-            label="Number input"
-            name="number-input"
-            type="number"
+          v-model="numberValue"
+          label="Number input"
+          name="number-input"
+          type="number"
         />
 
         <!-- Input with error -->
         <UikitInput
-            v-model="errorValue"
-            label="Input with error"
-            name="error-input"
-            error="This field is required"
+          v-model="errorValue"
+          label="Input with error"
+          name="error-input"
+          error="This field is required"
         />
 
         <!-- Disabled input -->
         <UikitInput
-            v-model="disabledValue"
-            label="Disabled input"
-            name="disabled-input"
-            disabled
+          v-model="disabledValue"
+          label="Disabled input"
+          name="disabled-input"
+          disabled
         />
       </div>
     </div>
@@ -64,20 +42,20 @@ const selectData = [
       <h2 class="mb-4">Select</h2>
       <div class="max-w-xs space-y-4">
         <UikitSelect
-            v-model="selectedValue"
-            :data="selectData"
-            label="Normal select"
-            name="normal-select"
-            empty="Select an option"
+          v-model="selectedValue"
+          :data="selectData"
+          label="Normal select"
+          name="normal-select"
+          empty="Select an option"
         />
 
         <UikitSelect
-            v-model="selectedOption2"
-            :data="selectData"
-            label="Disabled select"
-            name="disabled-select"
-            empty="Cannot select"
-            disabled
+          v-model="selectedOption2"
+          :data="selectData"
+          label="Disabled select"
+          name="disabled-select"
+          empty="Cannot select"
+          disabled
         />
       </div>
     </div>
@@ -155,7 +133,7 @@ const selectData = [
     <UikitButton outline>Button</UikitButton>
     <UikitButton outline>
       <UikitIcon name="configuration" color="currentColor" /> Button
-                                                              Button
+      Button
     </UikitButton>
     <UikitButton outline>
       <UikitIcon name="configuration" color="currentColor" /> Button
@@ -166,7 +144,7 @@ const selectData = [
     <UikitButton variant="secondary">Button</UikitButton>
     <UikitButton variant="secondary">
       <UikitIcon name="configuration" color="currentColor" /> Button
-                                                              Button
+      Button
     </UikitButton>
     <UikitButton variant="secondary">
       <UikitIcon name="configuration" color="currentColor" /> Button
@@ -177,58 +155,79 @@ const selectData = [
     <UikitButton outline variant="secondary">Button</UikitButton>
     <UikitButton outline variant="secondary">
       <UikitIcon name="configuration" color="currentColor" /> Button
-                                                              Button
+      Button
     </UikitButton>
     <UikitButton outline variant="secondary">
       <UikitIcon name="configuration" color="currentColor" /> Button
     </UikitButton>
   </div>
-
-
+  
+  
   <div class="bg-primary">
     <div class="p-2 flex gap-4">
-      <UikitButton background="dark">Button</UikitButton>
-      <UikitButton background="dark">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-                                                                Button
-      </UikitButton>
-      <UikitButton background="dark">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-      </UikitButton>
-    </div>
+    <UikitButton background="dark">Button</UikitButton>
+    <UikitButton background="dark">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+      Button
+    </UikitButton>
+    <UikitButton background="dark">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+    </UikitButton>
+  </div>
 
-    <div class="p-2 flex gap-4">
-      <UikitButton background="dark" outline>Button</UikitButton>
-      <UikitButton background="dark" outline>
-        <UikitIcon name="configuration" color="currentColor" /> Button
-                                                                Button
-      </UikitButton>
-      <UikitButton background="dark" outline>
-        <UikitIcon name="configuration" color="currentColor" /> Button
-      </UikitButton>
-    </div>
+  <div class="p-2 flex gap-4">
+    <UikitButton background="dark" outline>Button</UikitButton>
+    <UikitButton background="dark" outline>
+      <UikitIcon name="configuration" color="currentColor" /> Button
+      Button
+    </UikitButton>
+    <UikitButton background="dark" outline>
+      <UikitIcon name="configuration" color="currentColor" /> Button
+    </UikitButton>
+  </div>
 
-    <div class="p-2 flex gap-4">
-      <UikitButton background="dark" variant="secondary">Button</UikitButton>
-      <UikitButton background="dark" variant="secondary">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-                                                                Button
-      </UikitButton>
-      <UikitButton background="dark" variant="secondary">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-      </UikitButton>
-    </div>
+  <div class="p-2 flex gap-4">
+    <UikitButton background="dark" variant="secondary">Button</UikitButton>
+    <UikitButton background="dark" variant="secondary">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+      Button
+    </UikitButton>
+    <UikitButton background="dark" variant="secondary">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+    </UikitButton>
+  </div>
 
-    <div class="p-2 flex gap-4">
-      <UikitButton background="dark" outline variant="secondary">Button</UikitButton>
-      <UikitButton background="dark" outline variant="secondary">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-                                                                Button
-      </UikitButton>
-      <UikitButton background="dark" outline variant="secondary">
-        <UikitIcon name="configuration" color="currentColor" /> Button
-      </UikitButton>
-    </div>
+  <div class="p-2 flex gap-4">
+    <UikitButton background="dark" outline variant="secondary">Button</UikitButton>
+    <UikitButton background="dark" outline variant="secondary">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+      Button
+    </UikitButton>
+    <UikitButton background="dark" outline variant="secondary">
+      <UikitIcon name="configuration" color="currentColor" /> Button
+    </UikitButton>
+  </div>
   </div>
 
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// Input values
+const textValue = ref('')
+const numberValue = ref(0)
+const errorValue = ref('')
+const disabledValue = ref('Disabled value')
+
+const selectedValue = ref(null)
+const selectedOption2 = ref(null)
+const selectData = [
+  { label: 'Option 01', value: '01' },
+  { label: 'Option 02', value: '02' },
+  { label: 'Option 03', value: '03' },
+  { label: 'Option 04', value: '04' },
+  { label: 'Option 05', value: '05' },
+  { label: 'Option 06', value: '06' },
+]
+</script> 
