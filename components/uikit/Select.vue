@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 
 interface Option {
   label: string;
@@ -22,6 +23,13 @@ const props = defineProps<SelectProps>();
 const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
+const selectRef = ref(null);
+const triggerRef = ref(null);
+
+onClickOutside(selectRef, () => {
+  isOpen.value = false;
+});
+
 const selectedOptions = computed(() => {
   if (props.multiple) {
     return props.data.filter(opt => Array.isArray(props.modelValue) && props.modelValue.includes(opt.value));
@@ -105,13 +113,15 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 </script>
 
 <template>
-  <div :class="baseClasses">
+  <div :class="baseClasses" ref="selectRef">
     <label v-if="label" :for="name" :class="labelClasses">{{ label }}</label>
     <div class="relative">
       <div 
         :id="name"
         :class="triggerClasses"
         @click="toggleSelect"
+        ref="triggerRef"
+        tabindex="0"
       >
         <span class="truncate">
           {{ displayValue }}
