@@ -17,17 +17,30 @@ interface SelectProps {
   error?: string;
   multiple?: boolean;
   showSelectAll?: boolean;
+  searchable?: boolean;
 }
 
-const props = defineProps<SelectProps>();
+const props = withDefaults(defineProps<SelectProps>(), {
+  searchable: true
+});
+
 const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
 const selectRef = ref(null);
 const triggerRef = ref(null);
+const searchQuery = ref('');
 
 onClickOutside(selectRef, () => {
   isOpen.value = false;
+});
+
+const filteredOptions = computed(() => {
+  if (!searchQuery.value) return props.data;
+  const query = searchQuery.value.toLowerCase();
+  return props.data.filter(option => 
+    option.label.toLowerCase().includes(query)
+  );
 });
 
 const selectedOptions = computed(() => {
@@ -56,6 +69,9 @@ const isAllSelected = computed(() => {
 const toggleSelect = () => {
   if (!props.disabled) {
     isOpen.value = !isOpen.value;
+    if (isOpen.value) {
+      searchQuery.value = '';
+    }
   }
 };
 
@@ -106,6 +122,7 @@ const triggerClasses = computed(() => [
 ]);
 
 const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50 max-h-60 overflow-y-auto';
+const searchClasses = 'w-full px-3 py-2 border-b border-[#838F9E] border-opacity-40 focus:outline-none';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
 const selectAllClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100 border-b border-[#838F9E] border-opacity-40 font-medium';
 const clearButtonClasses = 'absolute right-8 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary-100 rounded-full transition-colors duration-200';
@@ -161,6 +178,17 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
         v-if="isOpen && !disabled" 
         :class="dropdownClasses"
       >
+        <!-- Campo de búsqueda -->
+        <div v-if="searchable" class="sticky top-0 bg-white z-10">
+          <input
+            v-model="searchQuery"
+            type="text"
+            :class="searchClasses"
+            placeholder="Buscar..."
+            @click.stop
+          />
+        </div>
+
         <!-- Opción Seleccionar todos -->
         <div 
           v-if="multiple && showSelectAll"
@@ -184,7 +212,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 
         <!-- Opciones normales -->
         <div 
-          v-for="option in data" 
+          v-for="option in filteredOptions" 
           :key="option.value"
           :class="[
             optionClasses,
@@ -205,6 +233,11 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
             <span v-else class="w-4 h-4 mr-2"></span>
             {{ option.label }}
           </div>
+        </div>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <div v-if="filteredOptions.length === 0" class="px-3 py-2 text-oscuro-300">
+          No se encontraron resultados
         </div>
       </div>
     </div>
