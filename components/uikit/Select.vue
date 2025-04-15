@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 
 interface Option {
   label: string;
@@ -16,12 +17,33 @@ interface SelectProps {
   error?: string;
   multiple?: boolean;
   showSelectAll?: boolean;
+  searchable?: boolean;
 }
 
-const props = defineProps<SelectProps>();
+const props = withDefaults(defineProps<SelectProps>(), {
+  searchable: true
+});
+
 const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
+const selectRef = ref(null);
+const triggerRef = ref(null);
+const searchInputRef = ref(null);
+const searchQuery = ref('');
+
+onClickOutside(selectRef, () => {
+  isOpen.value = false;
+});
+
+const filteredOptions = computed(() => {
+  if (!searchQuery.value) return props.data;
+  const query = searchQuery.value.toLowerCase();
+  return props.data.filter(option => 
+    option.label.toLowerCase().includes(query)
+  );
+});
+
 const selectedOptions = computed(() => {
   if (props.multiple) {
     return props.data.filter(opt => Array.isArray(props.modelValue) && props.modelValue.includes(opt.value));
@@ -45,9 +67,16 @@ const isAllSelected = computed(() => {
   return props.multiple && Array.isArray(props.modelValue) && props.modelValue.length === props.data.length;
 });
 
-const toggleSelect = () => {
+const toggleSelect = async () => {
   if (!props.disabled) {
     isOpen.value = !isOpen.value;
+    if (isOpen.value) {
+      searchQuery.value = '';
+      await nextTick();
+      if (searchInputRef.value) {
+        searchInputRef.value.focus();
+      }
+    }
   }
 };
 
@@ -97,6 +126,7 @@ const triggerClasses = computed(() => [
   }
 ]);
 
+const searchClasses = 'w-full h-full px-3 focus:outline-none bg-transparent';
 const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50 max-h-60 overflow-y-auto';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
 const selectAllClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100 border-b border-[#838F9E] border-opacity-40 font-medium';
@@ -105,17 +135,33 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 </script>
 
 <template>
-  <div :class="baseClasses">
+  <div :class="baseClasses" ref="selectRef">
     <label v-if="label" :for="name" :class="labelClasses">{{ label }}</label>
     <div class="relative">
       <div 
         :id="name"
         :class="triggerClasses"
         @click="toggleSelect"
+        ref="triggerRef"
+        tabindex="0"
       >
-        <span class="truncate">
-          {{ displayValue }}
-        </span>
+        <div class="flex-1 flex items-center">
+          <template v-if="!isOpen || !searchable">
+            <span class="truncate">
+              {{ displayValue }}
+            </span>
+          </template>
+          <template v-else>
+            <input
+              ref="searchInputRef"
+              v-model="searchQuery"
+              type="text"
+              :class="searchClasses"
+              placeholder="Buscar..."
+              @click.stop
+            />
+          </template>
+        </div>
         <div class="flex items-center">
           <button 
             v-if="selectedOptions.length > 0 && !disabled"
@@ -174,7 +220,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 
         <!-- Opciones normales -->
         <div 
-          v-for="option in data" 
+          v-for="option in filteredOptions" 
           :key="option.value"
           :class="[
             optionClasses,
@@ -195,6 +241,11 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
             <span v-else class="w-4 h-4 mr-2"></span>
             {{ option.label }}
           </div>
+        </div>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <div v-if="filteredOptions.length === 0" class="px-3 py-2 text-oscuro-300">
+          No se encontraron resultados
         </div>
       </div>
     </div>
