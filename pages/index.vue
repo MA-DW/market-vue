@@ -19,6 +19,7 @@ const selectData = [
   { label: 'Option 06', value: '06' },
 ]
 </script>
+
 <template>
   <div class="">
     <h1>Components</h1>
