@@ -3,6 +3,10 @@ import { Doughnut, Pie } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
+definePageMeta({
+  title: 'Availability Buildings'
+})
+
 const filters = reactive({
   market: '',
   submarket: '',
@@ -309,26 +313,8 @@ const chartOptions = ref({
       <span class="font-bold uppercase text-[32px]">INDUSTRIAL Listing</span>
     </div>
 
-    <div class="shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4 bg-white">
-      <div class="flex">
-        <div class="flex gap-4 flex-1">
-          Entries per page: 
-          <select name="per_pages">
-            <option>100</option>
-            <option>50</option>
-            <option>25</option>
-            <option>10</option>
-          </select>
-          Last update: 15/12/2024
-        </div>
-        <div class="flex gap-2">
-          <div class="bg-primary-100 cursor-pointer rounded p-1"><UikitIcon name="gallery" /></div>
-          <div class="bg-primary-100 cursor-pointer rounded p-1"><UikitIcon name="rows" /></div>
-          <div class="bg-primary-100 cursor-pointer rounded p-1"><UikitIcon name="compare" /></div>
-          <div class="bg-primary-100 cursor-pointer rounded p-1"><UikitIcon name="download" /></div>
-          <div class="bg-primary-100 cursor-pointer rounded p-1"><UikitIcon name="favorite" /></div>
-        </div>
-      </div>
+    <div>
+      <DatatableHome :filters="filters" />
     </div>
   </div>
 </template>

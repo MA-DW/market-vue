@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
+
+const route = useRoute()
+const pageTitle = computed(() => route.meta.title as string)
+
 const props = defineProps({
   showOverlay: Boolean,
 })
@@ -43,7 +47,7 @@ watch(isOpenNotification, (val) => {
 
         <!-- Desktop nav -->
         <div class="hidden flex-1 lg:flex items-center space-x-6 ">
-          <h1 class="uppercase text-primary mx-8">Titulo de la sección</h1>
+          <h1 class="uppercase text-primary mx-8">{{ pageTitle || 'Market App'  }}</h1>
         </div>
 
         <!-- Botón de login -->
