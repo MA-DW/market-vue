@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 
 interface Option {
@@ -29,6 +29,7 @@ const emit = defineEmits(['update:modelValue']);
 const isOpen = ref(false);
 const selectRef = ref(null);
 const triggerRef = ref(null);
+const searchInputRef = ref(null);
 const searchQuery = ref('');
 
 onClickOutside(selectRef, () => {
@@ -66,11 +67,15 @@ const isAllSelected = computed(() => {
   return props.multiple && Array.isArray(props.modelValue) && props.modelValue.length === props.data.length;
 });
 
-const toggleSelect = () => {
+const toggleSelect = async () => {
   if (!props.disabled) {
     isOpen.value = !isOpen.value;
     if (isOpen.value) {
       searchQuery.value = '';
+      await nextTick();
+      if (searchInputRef.value) {
+        searchInputRef.value.focus();
+      }
     }
   }
 };
@@ -121,8 +126,8 @@ const triggerClasses = computed(() => [
   }
 ]);
 
+const searchClasses = 'w-full h-full px-3 focus:outline-none bg-transparent';
 const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50 max-h-60 overflow-y-auto';
-const searchClasses = 'w-full px-3 py-2 border-b border-[#838F9E] border-opacity-40 focus:outline-none';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
 const selectAllClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100 border-b border-[#838F9E] border-opacity-40 font-medium';
 const clearButtonClasses = 'absolute right-8 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary-100 rounded-full transition-colors duration-200';
@@ -140,9 +145,23 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
         ref="triggerRef"
         tabindex="0"
       >
-        <span class="truncate">
-          {{ displayValue }}
-        </span>
+        <div class="flex-1 flex items-center">
+          <template v-if="!isOpen || !searchable">
+            <span class="truncate">
+              {{ displayValue }}
+            </span>
+          </template>
+          <template v-else>
+            <input
+              ref="searchInputRef"
+              v-model="searchQuery"
+              type="text"
+              :class="searchClasses"
+              placeholder="Buscar..."
+              @click.stop
+            />
+          </template>
+        </div>
         <div class="flex items-center">
           <button 
             v-if="selectedOptions.length > 0 && !disabled"
@@ -178,17 +197,6 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
         v-if="isOpen && !disabled" 
         :class="dropdownClasses"
       >
-        <!-- Campo de búsqueda -->
-        <div v-if="searchable" class="sticky top-0 bg-white z-10">
-          <input
-            v-model="searchQuery"
-            type="text"
-            :class="searchClasses"
-            placeholder="Buscar..."
-            @click.stop
-          />
-        </div>
-
         <!-- Opción Seleccionar todos -->
         <div 
           v-if="multiple && showSelectAll"
