@@ -37,12 +37,12 @@ const selectedOptions = computed(() => {
 
 const hasError = computed(() => !!props.error);
 const displayValue = computed(() => {
-  if (selectedOptions.value.length === 0) return props.empty || 'Seleccione una opción';
+  if (selectedOptions.value.length === 0) return props.empty || 'Select';
   if (props.multiple) {
-    if (selectedOptions.value.length === props.data.length) return 'Todos seleccionados';
+    if (selectedOptions.value.length === props.data.length) return 'All selected';
     return selectedOptions.value.length === 1 
       ? (selectedOptions.value as Option[])[0].label 
-      : `${selectedOptions.value.length} elementos seleccionados`;
+      : `${selectedOptions.value.length} items selected`;
   }
   return (selectedOptions.value as Option[])[0].label;
 });
@@ -93,7 +93,7 @@ const isSelected = (option: Option) => {
 const baseClasses = 'relative w-full font-normal text-base';
 const labelClasses = 'block mb-1 text-sm font-medium text-oscuro';
 const triggerClasses = computed(() => [
-  'w-full h-[40px] px-3 flex items-center justify-between rounded transition-all duration-200',
+  'w-full h-[40px] px-3 flex items-center justify-between rounded transition-all duration-200 bg-white',
   'border',
   {
     'border-[#C91038]': hasError.value,
@@ -103,7 +103,7 @@ const triggerClasses = computed(() => [
   }
 ]);
 
-const dropdownClasses = 'absolute w-full mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50 max-h-60 overflow-y-auto';
+const dropdownClasses = 'absolute w-full min-w-48 mt-1 bg-white border border-[#838F9E] rounded-md shadow-md z-50 max-h-60 overflow-y-auto';
 const optionClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100';
 const selectAllClasses = 'px-3 py-2 cursor-pointer hover:bg-secondary-100 border-b border-[#838F9E] border-opacity-40 font-medium';
 const clearButtonClasses = 'absolute right-8 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary-100 rounded-full transition-colors duration-200';
@@ -118,6 +118,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
         :id="name"
         :class="triggerClasses"
         @click="toggleSelect"
+        ref="dropdownRef"
       >
         <span class="truncate">
           {{ displayValue }}
@@ -128,7 +129,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
             type="button"
             :class="clearButtonClasses"
             @click="clearSelection"
-            title="Limpiar selección"
+            title="Clear selection"
           >
             <svg 
               class="w-4 h-4 text-oscuro-300"
@@ -174,7 +175,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
             <span v-else class="w-4 h-4 mr-2"></span>
-            Seleccionar todos
+            Select all
           </div>
         </div>
 
@@ -209,22 +210,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
       v-if="error"
       :class="errorClasses"
     >
-<<<<<<< HEAD
-      <div 
-        v-for="option in data" 
-        :key="option.value"
-        :class="[
-          optionClasses,
-          { 'bg-secondary-100': option.value === modelValue }
-        ]"
-        @click="selectOption(option)"
-      >
-        <span class="text-[#67707A]">{{ option.label }}</span>
-      </div>
-    </div>
-=======
       {{ error }}
     </p>
->>>>>>> develop
   </div>
 </template> 

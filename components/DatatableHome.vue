@@ -35,7 +35,7 @@ const props = defineProps<{
     category: string,
     type: string,
     deal: string,
-    availableSize: string,
+    availableSize: [number, number],
     isSf: boolean
   }
 }>()
@@ -160,7 +160,6 @@ const table = useVueTable({
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  debugTable: true,
 })
 
 function toggleColumnVisibility(column: Column<any, any>) {
@@ -265,53 +264,56 @@ onClickOutside(dropdownRef, () => {
     </div>
   </div>
 
-  <div class="bg-white overflow-x-auto shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4 my-5 rounded-lg">
-    <table class="border-collapse w-full">
-      <thead>
-        <tr
-          v-for="headerGroup in table.getHeaderGroups()"
-          :key="headerGroup.id"
-          class="bg-[#DEDFE3] text-oscuro-300 text-sm rounded-lg"
-        >
-          <th
-            v-for="(header, index) in headerGroup.headers"
-            :key="header.id"
-            :colSpan="header.colSpan"
-            class="uppercase py-4 px-2"
-            :class="[
-              header.column.getCanSort() ? 'cursor-pointer select-none' : '',
-              index === 0 ? 'rounded-tl-lg rounded-bl-lg' : '',
-              index === columns.length - 1 ? 'rounded-tr-lg rounded-br-lg' : ''
-            ]"
+  <div class="bg-white shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4 my-5 rounded-lg w-full">
+    
+    <div class="overflow-x-auto">
+      <table class="border-collapse w-full min-w-full">
+        <thead>
+          <tr
+            v-for="headerGroup in table.getHeaderGroups()"
+            :key="headerGroup.id"
+            class="bg-[#DEDFE3] text-oscuro-300 text-sm rounded-lg"
           >
-            <div @click="header.column.getToggleSortingHandler()?.($event)">
-              <FlexRender
-                v-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
-              <svg v-if="header.column.getIsSorted() === 'asc'" class="inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor"><path d="M11 9h9v2h-9zm0 4h7v2h-7zm0-8h11v2H11zm0 12h5v2h-5zm-6 3h2V8h3L6 4 2 8h3z"></path></svg>
-              <svg v-else-if="header.column.getIsSorted() === 'desc'" class="inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor"><path d="m6 20 4-4H7V4H5v12H2zm5-12h9v2h-9zm0 4h7v2h-7zm0-8h11v2H11zm0 12h5v2h-5z"></path></svg>
-            </div>
-            <template
-              v-if="!header.isPlaceholder && header.column.getCanFilter()"
+            <th
+              v-for="(header, index) in headerGroup.headers"
+              :key="header.id"
+              :colSpan="header.colSpan"
+              class="uppercase py-4 px-2"
+              :class="[
+                header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+                index === 0 ? 'rounded-tl-lg rounded-bl-lg' : '',
+                index === columns.length - 1 ? 'rounded-tr-lg rounded-br-lg' : ''
+              ]"
             >
-              <Filter :column="header.column" :table="table" />
-            </template>
-          </th>
-        </tr>
-      </thead>
-      <tbody class="">
-        <tr v-for="row in table.getRowModel().rows" :key="row.id" :class="{ 'opacity-40': rowVisibilityMap.get(row.id) === false }">
-          <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="border-b border-oscuro-100 py-2 text-center align-middle">
-            <FlexRender
-              :render="cell.column.columnDef.cell"
-              :props="cell.getContext()"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <div @click="header.column.getToggleSortingHandler()?.($event)">
+                <FlexRender
+                  v-if="!header.isPlaceholder"
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+                <svg v-if="header.column.getIsSorted() === 'asc'" class="inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor"><path d="M11 9h9v2h-9zm0 4h7v2h-7zm0-8h11v2H11zm0 12h5v2h-5zm-6 3h2V8h3L6 4 2 8h3z"></path></svg>
+                <svg v-else-if="header.column.getIsSorted() === 'desc'" class="inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor"><path d="m6 20 4-4H7V4H5v12H2zm5-12h9v2h-9zm0 4h7v2h-7zm0-8h11v2H11zm0 12h5v2h-5z"></path></svg>
+              </div>
+              <template
+                v-if="!header.isPlaceholder && header.column.getCanFilter()"
+              >
+                <Filter :column="header.column" :table="table" />
+              </template>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="">
+          <tr v-for="row in table.getRowModel().rows" :key="row.id" :class="{ 'opacity-40': rowVisibilityMap.get(row.id) === false }">
+            <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="border-b border-oscuro-100 py-2 text-center align-middle">
+              <FlexRender
+                :render="cell.column.columnDef.cell"
+                :props="cell.getContext()"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="my-5">
       <div class="flex flex-wrap text-oscuro-300 items-center">

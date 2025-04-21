@@ -4,8 +4,9 @@ import { computed } from 'vue';
 interface InputProps {
   // Required props
   modelValue: string | number; // value
-  label: string;
+  label?: string;
   name: string;
+  placeholder?: string;
   // Optional props
   type?: 'text' | 'number';
   disabled?: boolean;
@@ -48,6 +49,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
 <template>
   <div :class="baseClasses">
     <label 
+      v-if="label"
       :for="name"
       :class="labelClasses"
     >
@@ -63,6 +65,7 @@ const errorClasses = 'mt-1 text-sm text-[#C91038]';
         :disabled="disabled"
         :class="inputClasses"
         @input="updateValue"
+        :placeholder="placeholder"
       />
     </div>
 

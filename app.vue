@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useColorStore } from '@/stores/colors'
 const colorStore = useColorStore()
-colorStore.fetchColors()
 </script>
 <template>
   <div :style="{

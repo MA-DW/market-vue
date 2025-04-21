@@ -52,7 +52,7 @@ const toggle = (itemTitle: string) => {
 const isActiveRootByChilden = (childrens: (typeof menuItems)[number]['children']) => childrens?.map(i => i.to.name).includes(route.name as string);
 </script>
 <template>
-  <aside class="bg-oscuro-100 p-6 transition-all duration-300 overflow-x-hidden overflow-y-auto" :class="[isCollapsed ? 'w-24' : 'w-72']">
+  <aside class="bg-oscuro-100 p-6 transition-all duration-300 overflow-x-hidden overflow-y-auto flex-shrink-0" :class="[isCollapsed ? 'w-24' : 'w-72']">
       <nav>
         <ul>
           <li v-for="item in menuItems" :key="item.title" class="mb-1">

@@ -1,22 +1,163 @@
 <script setup lang="ts">
 import { Doughnut, Pie } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
+import { onClickOutside } from '@vueuse/core'
+import VueSlider from 'vue-3-slider-component'
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
 definePageMeta({
-  title: 'Availability Buildings'
+  title: 'Availability Buildings',
+  auth: true
 })
 
-const filters = reactive({
-  market: '',
-  submarket: '',
-  category: '',
-  type: '',
-  deal: '',
-  availableSize: '',
+type ItemCatalogs = {label: string; value: string | number}
+
+const buildingApi = useBuilding()
+const marketsApi = useMarket()
+const availabilityApi = useAvailabilityBuilding()
+
+const initialFilters = {
+  market: [],
+  submarket: [],
+  category: [],
+  type: [],
+  deal: [],
+  availableSize: [0, 50],
   isSf: true,
+
+  region: [],
+  status: [],
+  currency: [],
+  tenancy: [],
+  building_name: '',
+  industrialPark: [],
+  sharedTrunk: '',
+  doors: [],
+  developer: [],
+  askingPrice: true,
+}
+
+const filters = reactive(initialFilters)
+
+const markets = reactive({items: [] as ItemCatalogs[], loading: false});
+const submarkets = reactive({items: [] as ItemCatalogs[], loading: false});
+const categories = reactive({items: [] as ItemCatalogs[], loading: false});
+const types = reactive({items: [] as ItemCatalogs[], loading: false});
+const deals = reactive({items: [] as ItemCatalogs[], loading: false});
+const regions = reactive({items: [] as ItemCatalogs[], loading: false});
+const status = reactive({items: [] as ItemCatalogs[], loading: false});
+const currencies = reactive({items: [] as ItemCatalogs[], loading: false});
+const industrialParks = reactive({items: [] as ItemCatalogs[], loading: false});
+const developers = reactive({items: [] as ItemCatalogs[], loading: false});
+const loadingDoors = reactive({items: [] as ItemCatalogs[], loading: false});
+const tenancies = reactive({items: [] as ItemCatalogs[], loading: false});
+const sharedTruck = reactive({items: [{value: 'Yes', label: 'Yes'}, {value: 'No', label: 'No'}] as ItemCatalogs[], loading: false});
+
+async function fetchCategories() {
+  const response = await buildingApi.fetchCategories()
+  categories.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchMarkets() {
+  const response = await marketsApi.fetchMarkets()
+  markets.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id: value, name: label}) => ({label, value}))
+}
+
+async function fetchSubmarkets() {
+  const response = await marketsApi.fetchSubMarkets()
+  submarkets.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id: value, name: label}) => ({label, value}))
+}
+
+async function fetchTypes() {
+  const response = await buildingApi.fetchTypes({availability: true})
+  types.items = response.data.map(item => ({label: item, value: item}))
+}
+
+async function fetchDeals() {
+  const response = await buildingApi.fetchDeals()
+  deals.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchRegions() {
+  const response = await marketsApi.fetchRegions()
+  regions.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id, name}) => ({label: name, value: id}))
+}
+
+async function fetchIndustrialParks() {
+  const response = await marketsApi.fetchIndustrialParks()
+  industrialParks.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id, name}) => ({label: name, value: id}))
+}
+
+async function fetchDevelopers() {
+  const response = await marketsApi.fetchDevelopers({is_developer: true})
+  developers.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id, name}) => ({label: name, value: id}))
+}
+
+async function fetchCurrencies() {
+  const response = await buildingApi.fetchCurrencies()
+  currencies.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchStatus() {
+  const response = await buildingApi.fetchStatus()
+  status.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchLoadingDoor() {
+  const response = await buildingApi.fetchLoadingDoor()
+  loadingDoors.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchTenancies() {
+  const response = await buildingApi.fetchTenancies()
+  tenancies.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchAvl(filters: any) {
+  const response = await availabilityApi.fetchAvailability(filters);
+  console.log(response)
+}
+
+async function fetchAvlStatistics(filters: any) {
+  const response = await availabilityApi.fetchAvlStatistics(filters);
+  console.log(response)
+}
+
+onMounted(async () => {
+  fetchCategories()
+  fetchMarkets()
+  fetchSubmarkets()
+  fetchTypes()
+  fetchDeals()
+  fetchRegions()
+  fetchDevelopers()
+  fetchIndustrialParks()
+  fetchCurrencies()
+  fetchStatus()
+  fetchLoadingDoor()
+  fetchTenancies()
+
+  fetchAvl(filters);
+  fetchAvlStatistics(filters);
 })
 
+const isOpenAdvancedFilters = ref(false)
+const dropdownAdvancedFiltersRef = ref(null)
+
+onClickOutside(dropdownAdvancedFiltersRef, () => {
+  isOpenAdvancedFilters.value = false
+})
+
+const isOpenSize = ref(false)
+const dropdownSizeRef = ref(null)
+
+onClickOutside(dropdownSizeRef, () => {
+  isOpenSize.value = false
+})
+
+function submit() {
+  console.log('se ejecuto el submit', filters)
+}
 
 const chartData = ref({
   labels: ['Rojo', 'Azul', 'Amarillo'],
@@ -53,111 +194,239 @@ const chartOptions = ref({
 </script>
 <template>
   <div class="">
+    <form class="bg-primary rounded grid p-3" @submit.prevent="submit">
 
-    <div class="p-3 bg-primary rounded flex gap-2">
-      <div>
-        <UikitSelect
-          v-model="filters.market"
-          :data="[
-            { label: 'market 01', value: '01' },
-            { label: 'market 02', value: '02' },
-          ]"
-          empty="Market"
-          name="market"
-        />
+      <div class="grid grid-cols-4">
+        <!-- inputs -->
+        <div class="col-span-3 grid grid-cols-7 gap-2">
+          <div class="">
+            <UikitSelect
+              v-model="filters.market"
+              :data="markets.items"
+              empty="Market"
+              name="market"
+              multiple
+              show-select-all
+            />
+          </div>
+
+          <div class="">
+            <UikitSelect
+              v-model="filters.submarket"
+              :data="submarkets.items"
+              empty="Submarket"
+              name="submarket"
+              multiple
+              show-select-all
+            />
+          </div>
+
+          <div class="">
+            <UikitSelect
+              v-model="filters.category"
+              :data="categories.items"
+              name="class"
+              empty="Class"
+              multiple
+              show-select-all
+            />
+          </div>
+
+          <div class="">
+            <UikitSelect
+              v-model="filters.type"
+              :data="types.items"
+              empty="Type"
+              name="type"
+              multiple
+              show-select-all
+            />
+          </div>
+
+          <div class="">
+            <UikitSelect
+              v-model="filters.deal"
+              :data="deals.items"
+              empty="Deal"
+              name="deal"
+              multiple
+              show-select-all
+            />
+          </div>
+
+          <div class="relative" ref="dropdownSizeRef">
+            <div @click="isOpenSize = !isOpenSize" class="h-[40px] bg-white flex items-center rounded p-2">
+              <svg class="pointer-events-none" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_195_1845)">
+                <path d="M22.0713 11.4639L25.6068 14.9994L22.0713 18.5349" stroke="#403F41" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7.92871 18.5349L4.39318 14.9994L7.92871 11.4639" stroke="#403F41" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M25.6062 14.9998H17.3567" stroke="#403F41" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4.39377 14.9998H12.6433" stroke="#403F41" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+                <defs>
+                <clipPath id="clip0_195_1845">
+                <rect width="20" height="20" fill="white" transform="translate(15 0.857422) rotate(45)"/>
+                </clipPath>
+                </defs>
+              </svg>
+              <div class="pointer-events-none ml-1 overflow-hidden whitespace-nowrap text-ellipsis">
+                Available Size (SF)
+              </div>
+            </div>
+
+            <div v-if="isOpenSize" class="absolute block top-18 right-0 bg-white w-80 p-4 rounded shadow-[0px_2px_4px_0px_rgb(0_0_0_/_.15)] text-lg z-50">
+              <div class="bg-white p-4">
+                <VueSlider v-model="filters.availableSize" />
+              </div>
+    
+              <div class="flex">
+                <div>
+                  <UikitInput
+                    v-model="filters.availableSize[0]"
+                    label="Number input"
+                    name="number-input"
+                    type="number"
+                  />
+                </div>
+                <div class="p-1 w-auto">
+                  -
+                </div>
+                <div>
+                  <UikitInput
+                    v-model="filters.availableSize[1]"
+                    label="Number input"
+                    name="number-input"
+                    type="number"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative" ref="dropdownAdvancedFiltersRef">
+            <UikitButton @click="isOpenAdvancedFilters = !isOpenAdvancedFilters">
+              <UikitIcon name="configuration" color="currentColor" /> Advanced
+            </UikitButton>
+            <div v-if="isOpenAdvancedFilters" class="absolute block top-12 left-[-24px] bg-white w-[600px] rounded shadow-[0px_2px_4px_0px_rgb(0_0_0_/_.15)] p-0 text-lg z-[100]">
+              <div class="p-2 w-full flex flex-wrap">
+                
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.region"
+                    :data="regions.items"
+                    empty="Region"
+                    name="Region"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.status"
+                    :data="status.items"
+                    empty="Status"
+                    name="Status"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.currency"
+                    :data="currencies.items"
+                    empty="Currency"
+                    name="Currency"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.tenancy"
+                    :data="tenancies.items"
+                    empty="Tenancy"
+                    name="tenancies"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitInput
+                    v-model="filters.building_name"
+                    name="name"
+                    placeholder="Building name"
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.industrialPark"
+                    :data="industrialParks.items"
+                    empty="Industrial Parks"
+                    name="Industrial_Parks"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.sharedTrunk"
+                    :data="sharedTruck.items"
+                    empty="Shared Trunk Court Area"
+                    name="shared-trunk"
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.doors"
+                    :data="loadingDoors.items"
+                    empty="Loading Doors"
+                    name="Loading_Doors"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.developer"
+                    :data="developers.items"
+                    empty="Developers"
+                    name="Developers"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-2">
+                  <div class="flex">
+                    <div class="pr-2 text-oscuro-300 text-sm">Asking Price:</div>
+                    <UikitSwitchToggle v-model="filters.askingPrice" label-left="MO" label-right="YR" theme="dark" />
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- botones -->
+        <div class="grid grid-cols-7 gap-2 border-l border-[rgb(234_234_234_/_.2)]">
+          <div class="col-span-3 self-center">
+            <UikitSwitchToggle v-model="filters.isSf" label-left="SF" label-right="SM" />
+          </div>
+    
+          <div class="col-span-3">
+            <UikitButton class="w-full" type="submit">Search</UikitButton>
+          </div>
+
+          <div class="flex">
+            <div class="basis-full items-center justify-center bg-[#39709a] rounded flex" title="reset filters" @click="filters = initialFilters">
+              <UikitIcon name="reset" color="white" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <UikitSelect
-          v-model="filters.submarket"
-          :data="[
-            { label: 'submarket 01', value: '01' },
-            { label: 'submarket 02', value: '02' },
-          ]"
-          empty="Submarket"
-          name="submarket"
-        />
-      </div>
-
-      <div>
-        <UikitSelect
-          v-model="filters.category"
-          :data="[
-            { label: 'Class 01', value: '01' },
-            { label: 'Class 02', value: '02' },
-          ]"
-          empty="Class"
-          name="class"
-        />
-      </div>
-
-      <div>
-        <UikitSelect
-          v-model="filters.type"
-          :data="[
-            { label: 'Type 01', value: '01' },
-            { label: 'Type 02', value: '02' },
-          ]"
-          empty="Type"
-          name="type"
-        />
-      </div>
-
-      <div>
-        <UikitSelect
-          v-model="filters.deal"
-          :data="[
-            { label: 'deal 01', value: '01' },
-            { label: 'deal 02', value: '02' },
-          ]"
-          empty="Deal"
-          name="deal"
-        />
-      </div>
-
-      <div>
-        <UikitSelect
-          v-model="filters.availableSize"
-          :data="[
-            { label: 'available Size 01', value: '01' },
-            { label: 'available Size 02', value: '02' },
-          ]"
-          empty="Available size (SF)"
-          name="availableSize"
-        />
-      </div>
-
-      <div>
-        <UikitSelect
-          v-model="filters.market"
-          :data="[
-            { label: 'market 01', value: '01' },
-            { label: 'market 02', value: '02' },
-          ]"
-          empty="Market"
-          name="market"
-        />
-      </div>
-
-      <div>
-        <UikitButton>
-          <UikitIcon name="configuration" color="currentColor" /> Advanced
-        </UikitButton>
-      </div>
-
-      <div class="flex">
-        <UikitSwitchToggle v-model="filters.isSf" label-left="SF" label-right="SM" />
-      </div>
-
-      <div>
-        <UikitButton>Search</UikitButton>
-      </div>
-
-      <div>
-        <UikitButton title="reset filters"><UikitIcon name="reset" color="currentColor" /></UikitButton>
-      </div>
-
-    </div>
+    </form>
 
     <div class="w-full mt-4">
       <img src="/assets/images/map.png" alt="fake gmap" class="w-full">
@@ -314,7 +583,7 @@ const chartOptions = ref({
     </div>
 
     <div>
-      <DatatableHome :filters="filters" />
+      <DatatableHome :filters="(filters as any)" />
     </div>
   </div>
 </template>

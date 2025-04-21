@@ -6,6 +6,7 @@ type ButtonProps = {
   background?: 'light' | 'dark';
   outline?: boolean;
   text?: string;
+  type?: 'submit' | 'button' | 'reset';
 };
 
 const props = defineProps<ButtonProps>();
@@ -13,6 +14,7 @@ const attrs = useAttrs();
 
 const type = computed(() => props.variant || 'primary')
 const bg = computed(() => props.background || 'light')
+const typeBtn = computed(() => props.type || 'button')
 
 const baseClasses = 'box-border px-5 py-2.5 rounded flex items-center justify-center gap-2 text-lg font-normal border active:shadow-inset h-[40px]';
 const disabledClasses = 'box-border px-5 py-2.5 rounded flex items-center justify-center gap-2 text-lg font-normal border opacity-50 cursor-not-allowed text-disable-100 bg-terciary-200';
@@ -33,7 +35,7 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <button :class="classes">
+  <button :class="classes" :type="(typeBtn as any)" v-bind="$attrs">
     <slot v-if="$slots.default"></slot>
     <template v-else>
       <slot name="icon" v-if="$slots.icon"></slot>
