@@ -118,9 +118,30 @@ async function fetchAvl(filters: any) {
   console.log(response)
 }
 
+const statisticsCards = reactive({
+  totalBuilding: { total: 0, size: 0 },
+  totalCategoryA: { total: 0, size: 0 },
+  totalCategoryB: { total: 0, size: 0 },
+  totalCategoryC: { total: 0, size: 0 },
+  underConstruction: { total: 0, size: 0 },
+})
 async function fetchAvlStatistics(filters: any) {
   const response = await availabilityApi.fetchAvlStatistics(filters);
-  console.log(response)
+
+  statisticsCards.totalBuilding.total = response.data.total_buildings_count as any;
+  statisticsCards.totalBuilding.size = response.data.total_buildings as any;
+
+  statisticsCards.totalCategoryA.total = response.data.total_class_a_count as any;
+  statisticsCards.totalCategoryA.size = response.data.total_class_a as any;
+
+  statisticsCards.totalCategoryB.total = response.data.total_class_b_count as any;
+  statisticsCards.totalCategoryB.size = response.data.total_class_b as any;
+
+  statisticsCards.totalCategoryC.total = response.data.total_class_c_count as any;
+  statisticsCards.totalCategoryC.size = response.data.total_class_c as any;
+
+  statisticsCards.underConstruction.total = response.data.total_underconstruction_count as any;
+  statisticsCards.underConstruction.size = response.data.total_underconstruction as any;
 }
 
 onMounted(async () => {
@@ -436,18 +457,21 @@ const chartOptions = ref({
       <span class="font-bold uppercase text-[32px]">INDUSTRIAL Availability | Q2 2024</span>
     </div>
 
-    <div class="flex flex-wrap">
-      <div class="w-1/4 md:w-1/2 lg:w-1/4 pr-2">
-        <UikitCardNumber title="Card title/hame/header" text="000,000,000" value="000"></UikitCardNumber>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+      <div class="">
+        <UikitCardNumber title="Total Buildings" :text="statisticsCards.totalBuilding.size" :value="statisticsCards.totalBuilding.total"></UikitCardNumber>
       </div>
-      <div class="w-1/4 md:w-1/2 lg:w-1/4 px-2">
-        <UikitCardNumber title="Card title/hame/header" text="000,000,000" value="000"></UikitCardNumber>
+      <div class="">
+        <UikitCardNumber title="Buildings Class A" :text="statisticsCards.totalCategoryA.size" :value="statisticsCards.totalCategoryA.total"></UikitCardNumber>
       </div>
-      <div class="w-1/4 md:w-1/2 lg:w-1/4 px-2">
-        <UikitCardNumber title="Card title/hame/header" text="000,000,000" value="000"></UikitCardNumber>
+      <div class="">
+        <UikitCardNumber title="Buildings Class B" :text="statisticsCards.totalCategoryB.size" :value="statisticsCards.totalCategoryB.total"></UikitCardNumber>
       </div>
-      <div class="w-1/4 md:w-1/2 lg:w-1/4 pl-2">
-        <UikitCardNumber title="Card title/hame/header" text="000,000,000" value="000"></UikitCardNumber>
+      <div class="">
+        <UikitCardNumber title="Buildings Class C" :text="statisticsCards.totalCategoryC.size" :value="statisticsCards.totalCategoryC.total"></UikitCardNumber>
+      </div>
+      <div class="">
+        <UikitCardNumber title="Under Construction" :text="statisticsCards.underConstruction.size" :value="statisticsCards.underConstruction.total"></UikitCardNumber>
       </div>
     </div>
 
