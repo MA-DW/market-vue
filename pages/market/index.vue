@@ -3,6 +3,7 @@ import { Doughnut, Pie } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 import { onClickOutside } from '@vueuse/core'
 import VueSlider from 'vue-3-slider-component'
+import tailwind from '../../tailwind.config'
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
 definePageMeta({
@@ -118,30 +119,38 @@ async function fetchAvl(filters: any) {
   console.log(response)
 }
 
-const statisticsCards = reactive({
+const statisticsBuildings = reactive({
   totalBuilding: { total: 0, size: 0 },
-  totalCategoryA: { total: 0, size: 0 },
-  totalCategoryB: { total: 0, size: 0 },
-  totalCategoryC: { total: 0, size: 0 },
-  underConstruction: { total: 0, size: 0 },
+  totalCategoryA: { total: 0, size: 0, percent: 0 },
+  totalCategoryB: { total: 0, size: 0, percent: 0 },
+  totalCategoryC: { total: 0, size: 0, percent: 0 },
+  underConstruction: { total: 0, size: 0, percent: 0 },
 })
+
+const totalLocations = ref<{region_id: number, region_name: string, total: number, percent: number}[]>([])
 async function fetchAvlStatistics(filters: any) {
   const response = await availabilityApi.fetchAvlStatistics(filters);
 
-  statisticsCards.totalBuilding.total = response.data.total_buildings_count as any;
-  statisticsCards.totalBuilding.size = response.data.total_buildings as any;
+  statisticsBuildings.totalBuilding.total = response.data.total_buildings_count as any;
+  statisticsBuildings.totalBuilding.size = response.data.total_buildings as any;
 
-  statisticsCards.totalCategoryA.total = response.data.total_class_a_count as any;
-  statisticsCards.totalCategoryA.size = response.data.total_class_a as any;
+  statisticsBuildings.totalCategoryA.total = response.data.total_class_a_count as any;
+  statisticsBuildings.totalCategoryA.size = response.data.total_class_a as any;
+  statisticsBuildings.totalCategoryA.percent = response.data.total_percent_a as any;
 
-  statisticsCards.totalCategoryB.total = response.data.total_class_b_count as any;
-  statisticsCards.totalCategoryB.size = response.data.total_class_b as any;
+  statisticsBuildings.totalCategoryB.total = response.data.total_class_b_count as any;
+  statisticsBuildings.totalCategoryB.size = response.data.total_class_b as any;
+  statisticsBuildings.totalCategoryB.percent = response.data.total_percent_b as any;
 
-  statisticsCards.totalCategoryC.total = response.data.total_class_c_count as any;
-  statisticsCards.totalCategoryC.size = response.data.total_class_c as any;
+  statisticsBuildings.totalCategoryC.total = response.data.total_class_c_count as any;
+  statisticsBuildings.totalCategoryC.size = response.data.total_class_c as any;
+  statisticsBuildings.totalCategoryC.percent = response.data.total_percent_c as any;
 
-  statisticsCards.underConstruction.total = response.data.total_underconstruction_count as any;
-  statisticsCards.underConstruction.size = response.data.total_underconstruction as any;
+  statisticsBuildings.underConstruction.total = response.data.total_underconstruction_count as any;
+  statisticsBuildings.underConstruction.size = response.data.total_underconstruction as any;
+  statisticsBuildings.underConstruction.percent = response.data.total_percent_underconstruction as any;
+
+  totalLocations.value = response.data.total_by_locations as any as {region_id: number, region_name: string, total: number, percent: number}[]
 }
 
 onMounted(async () => {
@@ -180,37 +189,48 @@ function submit() {
   console.log('se ejecuto el submit', filters)
 }
 
-const chartData = ref({
-  labels: ['Rojo', 'Azul', 'Amarillo'],
+const chartData = computed(() => ({
+  labels: ['Under Construction'],
   datasets: [
     {
-      label: 'Distribución de colores',
-      data: [40, 30, 30],
-      backgroundColor: ['navy', '#60a5fa', 'blue'],
-      borderColor: ['#ffffff', '#ffffff', '#ffffff'],
-      borderWidth: 2,
+      label: '',
+      data: [statisticsBuildings.underConstruction.percent, 100 - statisticsBuildings.underConstruction.percent],
+      // @ts-ignore
+      backgroundColor: [tailwind.theme?.extend?.colors?.['secondary-fixed'] as string, 'rgb(131 143 158 / .15)'],
     }
   ]
-})
+}))
 
-const chartDataPie = ref({
-  labels: ['Producto A', 'Producto B', 'Producto C'],
+const chartDataPie = computed(() => ({
+  labels: ['Class A', 'Class B', 'Class C'],
   datasets: [
     {
-      label: '2023',
-      data: [40, 30, 30],
-      backgroundColor: ['navy', '#60a5fa', 'blue'],
+      label: 'A',
+      data: [statisticsBuildings.totalCategoryA.percent, 100 - statisticsBuildings.totalCategoryA.percent],
+      // @ts-ignore
+      backgroundColor: [tailwind.theme?.extend?.colors?.['primary-fixed'] as string, 'rgb(131 143 158 / .15)'],
     },
     {
-      label: '2024',
-      data: [20, 50, 30],
-      backgroundColor: ['#fb923c', '#34d399', '#a78bfa'],
+      label: 'B',
+      data: [statisticsBuildings.totalCategoryB.percent, 100 - statisticsBuildings.totalCategoryB.percent],
+      // @ts-ignore
+      backgroundColor: [tailwind.theme?.extend?.colors?.['secondary-fixed'] as string, 'rgb(131 143 158 / .15)'],
+    },
+    {
+      label: 'C',
+      data: [statisticsBuildings.totalCategoryC.percent, 100 - statisticsBuildings.totalCategoryC.percent],
+      // @ts-ignore
+      backgroundColor: [tailwind.theme?.extend?.colors?.['terciary'] as string, 'rgb(131 143 158 / .15)'],
     }
   ]
-})
+}))
 
 const chartOptions = ref({
   responsive: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: { enabled: false }
+  }
 })
 </script>
 <template>
@@ -459,140 +479,77 @@ const chartOptions = ref({
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
       <div class="">
-        <UikitCardNumber title="Total Buildings" :text="statisticsCards.totalBuilding.size" :value="statisticsCards.totalBuilding.total"></UikitCardNumber>
+        <UikitCardNumber title="Total Buildings" :text="statisticsBuildings.totalBuilding.size" :value="statisticsBuildings.totalBuilding.total"></UikitCardNumber>
       </div>
       <div class="">
-        <UikitCardNumber title="Buildings Class A" :text="statisticsCards.totalCategoryA.size" :value="statisticsCards.totalCategoryA.total"></UikitCardNumber>
+        <UikitCardNumber title="Buildings Class A" :text="statisticsBuildings.totalCategoryA.size" :value="statisticsBuildings.totalCategoryA.total"></UikitCardNumber>
       </div>
       <div class="">
-        <UikitCardNumber title="Buildings Class B" :text="statisticsCards.totalCategoryB.size" :value="statisticsCards.totalCategoryB.total"></UikitCardNumber>
+        <UikitCardNumber title="Buildings Class B" :text="statisticsBuildings.totalCategoryB.size" :value="statisticsBuildings.totalCategoryB.total"></UikitCardNumber>
       </div>
       <div class="">
-        <UikitCardNumber title="Buildings Class C" :text="statisticsCards.totalCategoryC.size" :value="statisticsCards.totalCategoryC.total"></UikitCardNumber>
+        <UikitCardNumber title="Buildings Class C" :text="statisticsBuildings.totalCategoryC.size" :value="statisticsBuildings.totalCategoryC.total"></UikitCardNumber>
       </div>
       <div class="">
-        <UikitCardNumber title="Under Construction" :text="statisticsCards.underConstruction.size" :value="statisticsCards.underConstruction.total"></UikitCardNumber>
+        <UikitCardNumber title="Under Construction" :text="statisticsBuildings.underConstruction.size" :value="statisticsBuildings.underConstruction.total"></UikitCardNumber>
       </div>
     </div>
 
-    <div class="flex flex-wrap w-full mt-4">
-      <div class="w-full md:w-1/2 lg:w-1/4 pr-2">
-        <div class="h-full rounded-lg bg-white shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4">
-          <div class="font-calibri font-bold text-[20px]">Building by location</div>
+    <div class="grid grid-cols-1 lg:grid-cols-4 mt-4 gap-2">
 
-          <div class="mt-4 overflow-auto max-h-96">
-            <div class="mb-4">
+      <div class="">
+        <div class="h-full rounded-lg bg-white shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4">
+          <div class="mb-4 font-calibri font-bold text-[20px]">Building by location</div>
+
+          <div v-for="(location) in totalLocations" :key="location.region_id" class="mb-2 overflow-auto max-h-96">
+            <div class="mb-2">
               <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
+                <span>{{ location.region_name }}</span>
+                <span class="font-semibold text-gray-800">{{ location.percent }}%</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                <span>Aguascalientes</span>
-                <span class="font-semibold text-gray-800">27.5%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 27.5%;"></div>
+                <div class="bg-terciary h-2.5 rounded-full" :style="{width: `${location.percent}%`}"></div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
-      <div class="w-full lg:w-2/4 px-2">
+
+      <div class="lg:col-span-2">
         <div class="h-full rounded-lg bg-white shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4">
           <div class="flex">
-            <div class="w-1/2">
+            <div class="w-7/12">
               <Pie
                 id="my-chart-id"
                 :options="chartOptions"
                 :data="chartDataPie"
               />
             </div>
-            <div class="w-1/2">
+            <div class="w-5/12 border-l">
               <div>
                 <div class="text-center font-calibri font-bold text-[20px]">Pecentage by Class</div>
-                <div class="flex flex-col text-center mt-10">
-                  <div class="font-bold text-[45px]">59.14%</div>
-                  <div class="text-gray-600"><div class="w-3 h-3 rounded-full mr-2 bg-primary inline-block"></div>Class A Building</div>
+                <div class="flex flex-col text-center mt-5">
+                  <div class="font-bold text-[45px]">{{ statisticsBuildings.totalCategoryA.percent }}%</div>
+                  <div class="text-gray-600"><div class="w-3 h-3 rounded-full mr-2 bg-primary-fixed inline-block"></div>Class A Building</div>
                 </div>
-                <div class="flex flex-col text-center mt-10">
-                  <div class="font-bold text-[45px]">45.06%</div>
-                  <div class="text-gray-600"><div class="w-3 h-3 rounded-full mr-2 bg-secondary inline-block"></div>Class A Building</div>
+                <div class="flex flex-col text-center mt-5">
+                  <div class="font-bold text-[45px]">{{ statisticsBuildings.totalCategoryB.percent }}%</div>
+                  <div class="text-gray-600"><div class="w-3 h-3 rounded-full mr-2 bg-secondary-fixed inline-block"></div>Class B Building</div>
+                </div>
+                <div class="flex flex-col text-center mt-5">
+                  <div class="font-bold text-[45px]">{{ statisticsBuildings.totalCategoryC.percent }}%</div>
+                  <div class="text-gray-600"><div class="w-3 h-3 rounded-full mr-2 bg-terciary inline-block"></div>Class C Building</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="w-full md:w-1/2 lg:w-1/4 pl-2">
+
+      <div class="">
         <div class="h-full rounded-lg bg-white shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4">
+          <div class="font-bold text-[20px] text-center">Under Construction {{ statisticsBuildings.underConstruction.percent }}%</div>
           <Doughnut
             id="my-chart-id"
             :options="chartOptions"
@@ -600,6 +557,7 @@ const chartOptions = ref({
           />
         </div>
       </div>
+
     </div>
 
     <div class="my-5">
