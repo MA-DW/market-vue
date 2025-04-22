@@ -266,9 +266,6 @@ const chartOptions = ref({
 </script>
 <template>
   <div class="">
-    <div class="pa-6">
-      {{ filters }}
-    </div>
     <form class="bg-primary rounded grid p-3" @submit.prevent="submit">
 
       <div class="grid grid-cols-4">
