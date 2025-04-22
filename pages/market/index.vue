@@ -4,6 +4,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 import { onClickOutside } from '@vueuse/core'
 import VueSlider from 'vue-3-slider-component'
 import tailwind from '../../tailwind.config'
+import type { OptionsAvailability } from '../../composables/useAvailabilityBuilding'
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
 definePageMeta({
@@ -17,28 +18,35 @@ const buildingApi = useBuilding()
 const marketsApi = useMarket()
 const availabilityApi = useAvailabilityBuilding()
 
-const initialFilters = {
-  market: [],
-  submarket: [],
-  category: [],
-  type: [],
-  deal: [],
-  availableSize: [0, 50],
-  isSf: true,
+const datatable = ref(null)
 
-  region: [],
-  status: [],
+const initialFilters = {
+  market_id: [],
+  sub_market_id: [],
+  class: [],
+  avl_type: [],
+  deal: [],
+  size_sf: [0, 1000000],
+  sqftToM2: true,
+
+  region_id: [],
   currency: [],
   tenancy: [],
   building_name: '',
-  industrialPark: [],
-  sharedTrunk: '',
-  doors: [],
-  developer: [],
-  askingPrice: true,
+  industrial_park_id: [],
+  shared_truck: '',
+  loading_door: [],
+  developer_id: [],
+  above_market_tis: [],
+  generation: [],
+  clear_height_ft: [0, 1000000],
+  owner_id: [],
+  owner_type: [],
+  latitud: '',
+  longitud: '',
 }
 
-const filters = reactive(initialFilters)
+const filters = reactive(structuredClone(initialFilters))
 
 const markets = reactive({items: [] as ItemCatalogs[], loading: false});
 const submarkets = reactive({items: [] as ItemCatalogs[], loading: false});
@@ -46,13 +54,16 @@ const categories = reactive({items: [] as ItemCatalogs[], loading: false});
 const types = reactive({items: [] as ItemCatalogs[], loading: false});
 const deals = reactive({items: [] as ItemCatalogs[], loading: false});
 const regions = reactive({items: [] as ItemCatalogs[], loading: false});
-const status = reactive({items: [] as ItemCatalogs[], loading: false});
+const generations = reactive({items: [] as ItemCatalogs[], loading: false});
 const currencies = reactive({items: [] as ItemCatalogs[], loading: false});
 const industrialParks = reactive({items: [] as ItemCatalogs[], loading: false});
 const developers = reactive({items: [] as ItemCatalogs[], loading: false});
 const loadingDoors = reactive({items: [] as ItemCatalogs[], loading: false});
 const tenancies = reactive({items: [] as ItemCatalogs[], loading: false});
-const sharedTruck = reactive({items: [{value: 'Yes', label: 'Yes'}, {value: 'No', label: 'No'}] as ItemCatalogs[], loading: false});
+const owners = reactive({items: [] as ItemCatalogs[], loading: false});
+const ownerTypes = reactive({items: [] as ItemCatalogs[], loading: false});
+const aboveMarketTis = reactive({items: [] as ItemCatalogs[], loading: false});
+const sharedTruck = reactive({items: [{value: '0', label: 'Yes'}, {value: '1', label: 'No'}] as ItemCatalogs[], loading: false});
 
 async function fetchCategories() {
   const response = await buildingApi.fetchCategories()
@@ -99,9 +110,9 @@ async function fetchCurrencies() {
   currencies.items = Object.values(response.data).map(k => ({label: k, value: k}))
 }
 
-async function fetchStatus() {
-  const response = await buildingApi.fetchStatus()
-  status.items = Object.values(response.data).map(k => ({label: k, value: k}))
+async function fetchGeneration() {
+  const response = await buildingApi.fetchGeneration()
+  generations.items = Object.values(response.data).map(k => ({label: k, value: k}))
 }
 
 async function fetchLoadingDoor() {
@@ -114,6 +125,21 @@ async function fetchTenancies() {
   tenancies.items = Object.values(response.data).map(k => ({label: k, value: k}))
 }
 
+async function fetchOwnerTypes() {
+  const response = await buildingApi.fetchOwnerTypes()
+  ownerTypes.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
+async function fetchOwner() {
+  const response = await marketsApi.fetchDevelopers({is_owner: true})
+  owners.items = response.data.sort((a, b) => a.name.localeCompare(b.name)).map(({id, name}) => ({label: name, value: id}))
+}
+
+async function fetchAboveMarketTis() {
+  const response = await buildingApi.fetchTechnicalImprovements()
+  aboveMarketTis.items = Object.values(response.data).map(k => ({label: k, value: k}))
+}
+
 const statisticsBuildings = reactive({
   totalBuilding: { total: 0, size: 0 },
   totalCategoryA: { total: 0, size: 0, percent: 0 },
@@ -123,7 +149,7 @@ const statisticsBuildings = reactive({
 })
 
 const totalLocations = ref<{region_id: number, region_name: string, total: number, percent: number}[]>([])
-async function fetchAvlStatistics(filters: any) {
+async function fetchAvlStatistics() {
   const response = await availabilityApi.fetchAvlStatistics(filters);
 
   statisticsBuildings.totalBuilding.total = response.data.total_buildings_count as any;
@@ -158,11 +184,14 @@ onMounted(async () => {
   fetchDevelopers()
   fetchIndustrialParks()
   fetchCurrencies()
-  fetchStatus()
+  fetchGeneration()
   fetchLoadingDoor()
   fetchTenancies()
+  fetchOwner()
+  fetchOwnerTypes()
+  fetchAboveMarketTis()
 
-  fetchAvlStatistics(filters);
+  fetchAvlStatistics();
 })
 
 const isOpenAdvancedFilters = ref(false)
@@ -180,7 +209,15 @@ onClickOutside(dropdownSizeRef, () => {
 })
 
 function submit() {
-  console.log('se ejecuto el submit', filters)
+  fetchAvlStatistics()
+  if (datatable.value) {
+    // @ts-ignore
+    datatable.value.fetchAvl()
+  }
+}
+
+function reset() {
+  Object.keys(filters).forEach((k) => (filters as any)[k] = initialFilters[k as keyof typeof filters])
 }
 
 const chartData = computed(() => ({
@@ -229,6 +266,9 @@ const chartOptions = ref({
 </script>
 <template>
   <div class="">
+    <div class="pa-6">
+      {{ filters }}
+    </div>
     <form class="bg-primary rounded grid p-3" @submit.prevent="submit">
 
       <div class="grid grid-cols-4">
@@ -236,7 +276,7 @@ const chartOptions = ref({
         <div class="col-span-3 grid grid-cols-7 gap-2">
           <div class="">
             <UikitSelect
-              v-model="filters.market"
+              v-model="filters.market_id"
               :data="markets.items"
               empty="Market"
               name="market"
@@ -247,7 +287,7 @@ const chartOptions = ref({
 
           <div class="">
             <UikitSelect
-              v-model="filters.submarket"
+              v-model="filters.sub_market_id"
               :data="submarkets.items"
               empty="Submarket"
               name="submarket"
@@ -258,7 +298,7 @@ const chartOptions = ref({
 
           <div class="">
             <UikitSelect
-              v-model="filters.category"
+              v-model="filters.class"
               :data="categories.items"
               name="class"
               empty="Class"
@@ -269,7 +309,7 @@ const chartOptions = ref({
 
           <div class="">
             <UikitSelect
-              v-model="filters.type"
+              v-model="filters.avl_type"
               :data="types.items"
               empty="Type"
               name="type"
@@ -310,16 +350,15 @@ const chartOptions = ref({
             </div>
 
             <div v-if="isOpenSize" class="absolute block top-18 right-0 bg-white w-80 p-4 rounded shadow-[0px_2px_4px_0px_rgb(0_0_0_/_.15)] text-lg z-50">
-              <div class="bg-white p-4">
-                <VueSlider v-model="filters.availableSize" />
+              <div class="bg-white p-4 mt-6">
+                <VueSlider v-model="filters.size_sf" :min="0" :max="1000000" tooltip="always" />
               </div>
     
               <div class="flex">
                 <div>
                   <UikitInput
-                    v-model="filters.availableSize[0]"
-                    label="Number input"
-                    name="number-input"
+                    v-model="filters.size_sf[0]"
+                    name="size_1"
                     type="number"
                   />
                 </div>
@@ -328,9 +367,8 @@ const chartOptions = ref({
                 </div>
                 <div>
                   <UikitInput
-                    v-model="filters.availableSize[1]"
-                    label="Number input"
-                    name="number-input"
+                    v-model="filters.size_sf[1]"
+                    name="size_2"
                     type="number"
                   />
                 </div>
@@ -347,7 +385,7 @@ const chartOptions = ref({
                 
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.region"
+                    v-model="filters.region_id"
                     :data="regions.items"
                     empty="Region"
                     name="Region"
@@ -357,10 +395,10 @@ const chartOptions = ref({
                 </div>
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.status"
-                    :data="status.items"
-                    empty="Status"
-                    name="Status"
+                    v-model="filters.generation"
+                    :data="generations.items"
+                    empty="Generation"
+                    name="Generation"
                     multiple
                     show-select-all
                   />
@@ -394,7 +432,7 @@ const chartOptions = ref({
                 </div>
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.industrialPark"
+                    v-model="filters.industrial_park_id"
                     :data="industrialParks.items"
                     empty="Industrial Parks"
                     name="Industrial_Parks"
@@ -404,7 +442,7 @@ const chartOptions = ref({
                 </div>
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.sharedTrunk"
+                    v-model="filters.shared_truck"
                     :data="sharedTruck.items"
                     empty="Shared Trunk Court Area"
                     name="shared-trunk"
@@ -412,7 +450,7 @@ const chartOptions = ref({
                 </div>
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.doors"
+                    v-model="filters.loading_door"
                     :data="loadingDoors.items"
                     empty="Loading Doors"
                     name="Loading_Doors"
@@ -422,7 +460,7 @@ const chartOptions = ref({
                 </div>
                 <div class="w-1/3 p-1">
                   <UikitSelect
-                    v-model="filters.developer"
+                    v-model="filters.developer_id"
                     :data="developers.items"
                     empty="Developers"
                     name="Developers"
@@ -430,14 +468,68 @@ const chartOptions = ref({
                     show-select-all
                   />
                 </div>
-                <div class="w-1/3 p-2">
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.owner_id"
+                    :data="owners.items"
+                    empty="Owners"
+                    name="Owners"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.owner_type"
+                    :data="ownerTypes.items"
+                    empty="Owner Type"
+                    name="Owner-Type"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+                <div class="w-1/3 p-1">
+                  <UikitSelect
+                    v-model="filters.above_market_tis"
+                    :data="aboveMarketTis.items"
+                    empty="above market tis"
+                    name="above_market_tis"
+                    multiple
+                    show-select-all
+                  />
+                </div>
+
+                <div class="w-1/3 p-1">
+                  <UikitInput
+                    v-model="filters.latitud"
+                    name="latitud"
+                    placeholder="Latitude"
+                  />
+                </div>
+
+                <div class="w-1/3 p-1">
+                  <UikitInput
+                    v-model="filters.longitud"
+                    name="longitud"
+                    placeholder="longitude"
+                  />
+                </div>
+
+                <div class="w-1/3"></div>
+
+                <div class="w-2/3 p-1">
+                  <div class="bg-white p-4 mt-6">
+                    <VueSlider v-model="filters.clear_height_ft" :min="0" :max="1000000" tooltip="always" />
+                    <span class="text-base">Clear Height (FT)</span>
+                  </div>
+                </div>
+
+                <!-- <div class="w-1/3 p-2">
                   <div class="flex">
                     <div class="pr-2 text-oscuro-300 text-sm">Asking Price:</div>
                     <UikitSwitchToggle v-model="filters.askingPrice" label-left="MO" label-right="YR" theme="dark" />
                   </div>
-                </div>
-
-
+                </div> -->
               </div>
             </div>
           </div>
@@ -446,7 +538,7 @@ const chartOptions = ref({
         <!-- botones -->
         <div class="grid grid-cols-7 gap-2 border-l border-[rgb(234_234_234_/_.2)]">
           <div class="col-span-3 self-center">
-            <UikitSwitchToggle v-model="filters.isSf" label-left="SF" label-right="SM" />
+            <UikitSwitchToggle v-model="filters.sqftToM2" label-left="SF" label-right="SM" />
           </div>
     
           <div class="col-span-3">
@@ -454,7 +546,7 @@ const chartOptions = ref({
           </div>
 
           <div class="flex">
-            <div class="basis-full items-center justify-center bg-[#39709a] rounded flex" title="reset filters" @click="filters = initialFilters">
+            <div @click="reset" class="cursor-pointer basis-full items-center justify-center bg-[#39709a] rounded flex" title="reset filters">
               <UikitIcon name="reset" color="white" />
             </div>
           </div>
@@ -559,7 +651,7 @@ const chartOptions = ref({
     </div>
 
     <div>
-      <DatatableHome :filters="(filters as any)" />
+      <DatatableHome :filters="(filters)" ref="datatable" />
     </div>
   </div>
 </template>

@@ -1,4 +1,3 @@
-import QueryString from "qs";
 import { useAuthStore } from "~/stores/auth";
 
 export const useApi = () => {
@@ -8,6 +7,9 @@ export const useApi = () => {
   const fetchWithAuth = async (url: string, options: any = {}) => {
     options.baseURL = config.public.apiBase;
     options.headers = options.headers || {};
+    options.headers["Content-Type"] = "application/json";
+    options.headers["Accept"] = "application/json";
+
     if (auth.token) {
       options.headers.Authorization = `Bearer ${auth.token}`;
     }

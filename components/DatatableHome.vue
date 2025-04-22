@@ -48,15 +48,7 @@ interface BuildingInterface {
 const availabilityApi = useAvailabilityBuilding()
 
 const props = defineProps<{
-  filters: {
-    market: string,
-    submarket: string,
-    category: string,
-    type: string,
-    deal: string,
-    availableSize: [number, number],
-    isSf: boolean
-  }
+  filters: OptionsAvailability
 }>()
 
 const data = ref<BuildingInterface[]>([])
@@ -260,13 +252,13 @@ function handleGoToPage(e: any) {
   table.setPageIndex(page)
 }
 
-async function fetchAvl(filters: any) {
-  const response = await availabilityApi.fetchAvailability(filters);
+async function fetchAvl() {
+  const response = await availabilityApi.fetchAvailability(props.filters);
   data.value = response.data as any
 }
 
 onMounted(async () => {
-  fetchAvl(props.filters);
+  fetchAvl();
 })
 
 const isOpen = ref(false)
@@ -274,6 +266,10 @@ const dropdownRef = ref(null)
 
 onClickOutside(dropdownRef, () => {
   isOpen.value = false
+})
+
+defineExpose({
+  fetchAvl
 })
 </script>
 <template>
