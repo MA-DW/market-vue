@@ -278,10 +278,10 @@ onClickOutside(dropdownRef, () => {
 </script>
 <template>
   <div class="shadow-[0_10px_30px_0_rgb(0_0_0_/_.05)] p-4 bg-white my-5 rounded-lg">
-    <div class="flex">
+    <div class="flex items-center">
       <div class="flex gap-4 flex-1">
         Entries per page: 
-        <select name="per_pages" :value="table.getState().pagination.pageSize" @change="handlePageSizeChange">
+        <select name="per_pages" class="rounded outline-[#838F9E]/40 border !border-[#838F9E]/40 bg-white" :value="table.getState().pagination.pageSize" @change="handlePageSizeChange">
           <option v-for="pageSize in pageSizes" :key="pageSize" :value="pageSize">{{ pageSize }}</option>
         </select>
         Last update: 15/12/2024
