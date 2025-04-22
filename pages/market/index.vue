@@ -114,11 +114,6 @@ async function fetchTenancies() {
   tenancies.items = Object.values(response.data).map(k => ({label: k, value: k}))
 }
 
-async function fetchAvl(filters: any) {
-  const response = await availabilityApi.fetchAvailability(filters);
-  console.log(response)
-}
-
 const statisticsBuildings = reactive({
   totalBuilding: { total: 0, size: 0 },
   totalCategoryA: { total: 0, size: 0, percent: 0 },
@@ -167,7 +162,6 @@ onMounted(async () => {
   fetchLoadingDoor()
   fetchTenancies()
 
-  fetchAvl(filters);
   fetchAvlStatistics(filters);
 })
 

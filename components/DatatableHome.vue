@@ -12,21 +12,40 @@ import {
   type RowSelectionState,
   type SortingState
 } from '@tanstack/vue-table';
-import {faker} from '@faker-js/faker'
 import { onClickOutside } from '@vueuse/core';
 
 interface BuildingInterface {
-  id: number;
-  name: string;
-  category: string;
-  size: string;
-  availableSf: string;
-  minimumSpace: string;
-  expansionUpTo: string;
-  industrialPark: {id: number, name: string};
-  clearHeight: string;
-  dockDoor : string;
+  // id: number
+  "class": 'A' | 'B' | 'C'
+  "building_name": string
+  "building_size": number
+  "available_size": number
+  "minimum_space": number
+  "expansion_up_to": number
+  "industrial_park": string
+  "clear_height": number
+  "dock_doors": number
+  "drive_in_door": string | number
+  "floor_thickness": string | number
+  "type": string
+  "owner": string
+  "developer": string
+  "builder": string
+  "generation": string
+  "market": string
+  "submarket": string
+  "deal": string
+  "currency": string
+  "min_lease": string | number
+  "max_lease": string | number
+  "sale_price": string | number
+  "available_since": string
+  "tenancy": string
+  "broker": string
+  "comments": string
 }
+
+const availabilityApi = useAvailabilityBuilding()
 
 const props = defineProps<{
   filters: {
@@ -87,35 +106,89 @@ const columns = [
       )
     }
   }),
-  columnHelper.accessor('name', {
+  columnHelper.accessor('building_name', {
     header: 'Building Name',
   }),
-  columnHelper.accessor('category', {
+  columnHelper.accessor('class', {
     header: 'Class',
     cell: (info) => {
-      return h('span', {class: 'inline-flex justify-center items-center bg-terciary-100 h-5 w-5 text-sm text-primary rounded-full font-bold'}, info.getValue())
+      return h('span', {class: 'inline-flex justify-center items-center bg-terciary-100 h-5 w-5 text-sm text-primary-fixed rounded-full font-bold'}, info.getValue())
     },
   }),
-  columnHelper.accessor('size', {
+  columnHelper.accessor('building_size', {
     header: 'Building Size',
   }),
-  columnHelper.accessor('availableSf', {
+  columnHelper.accessor('available_size', {
     header: 'Available (SF)',
   }),
-  columnHelper.accessor('minimumSpace', {
+  columnHelper.accessor('minimum_space', {
     header: 'Minimum Space',
   }),
-  columnHelper.accessor('expansionUpTo', {
+  columnHelper.accessor('expansion_up_to', {
     header: 'Expansion Up To (SF)',
   }),
-  columnHelper.accessor('industrialPark.name', {
+  columnHelper.accessor('industrial_park', {
     header: 'Industrial Park',
   }),
-  columnHelper.accessor('clearHeight', {
+  columnHelper.accessor('clear_height', {
     header: 'Clear Height',
   }),
-  columnHelper.accessor('dockDoor', {
+  columnHelper.accessor('dock_doors', {
     header: 'Dock Door',
+  }),
+  columnHelper.accessor('drive_in_door', {
+    header: 'Drive in Door',
+  }),
+  columnHelper.accessor('floor_thickness', {
+    header: 'Floor Thickness',
+  }),
+  columnHelper.accessor('type', {
+    header: 'Type',
+  }),
+  columnHelper.accessor('owner', {
+    header: 'Owner',
+  }),
+  columnHelper.accessor('developer', {
+    header: 'Developer',
+  }),
+  columnHelper.accessor('builder', {
+    header: 'Builder',
+  }),
+  columnHelper.accessor('generation', {
+    header: 'Generation',
+  }),
+  columnHelper.accessor('market', {
+    header: 'Market',
+  }),
+  columnHelper.accessor('submarket', {
+    header: 'Submarket',
+  }),
+  columnHelper.accessor('deal', {
+    header: 'Deal',
+  }),
+  columnHelper.accessor('currency', {
+    header: 'Currency',
+  }),
+  columnHelper.accessor('min_lease', {
+    header: 'Min Lease',
+  }),
+  columnHelper.accessor('max_lease', {
+    header: 'Max Lease',
+  }),
+  columnHelper.accessor('sale_price', {
+    header: 'Sale Price',
+  }),
+  columnHelper.accessor('available_since', {
+    header: 'Available Since',
+  }),
+  columnHelper.accessor('tenancy', {
+    header: 'Tenancy',
+  }),
+  columnHelper.accessor('broker', {
+    header: 'Broker',
+  }),
+  columnHelper.accessor('comments', {
+    header: 'comments',
   }),
 ]
 
@@ -187,27 +260,13 @@ function handleGoToPage(e: any) {
   table.setPageIndex(page)
 }
 
+async function fetchAvl(filters: any) {
+  const response = await availabilityApi.fetchAvailability(filters);
+  data.value = response.data as any
+}
+
 onMounted(async () => {
-  data.value = await new Promise<BuildingInterface[]>(r => {
-    const fakeData: BuildingInterface[] = [];
-
-    for (let i = 0; i < 100; i++) {
-      fakeData.push({
-        id: i + 1,
-        name: faker.company.name(),
-        category: faker.helpers.arrayElement(['A', 'B', 'C']),
-        size: faker.number.float({multipleOf: .05, min: 100, max: 1000}).toString(),
-        minimumSpace: faker.number.float({multipleOf: .05, min: 100, max: 1000}).toString(),
-        expansionUpTo: faker.number.float({multipleOf: .05, min: 100, max: 1000}).toString(),
-        industrialPark: {id: i + 1, name: faker.company.name()},
-        clearHeight: faker.number.float({multipleOf: .05, min: 100, max: 1000}).toString() + 'ft',
-        dockDoor: faker.number.int({min: 0, max: 9}).toString(),
-        availableSf: faker.number.float({multipleOf: .05, min: 100, max: 1000}).toString() + 'ft',
-      });
-    }
-
-    r(fakeData)
-  })
+  fetchAvl(props.filters);
 })
 
 const isOpen = ref(false)
@@ -303,7 +362,7 @@ onClickOutside(dropdownRef, () => {
           </tr>
         </thead>
         <tbody class="">
-          <tr v-for="row in table.getRowModel().rows" :key="row.id" :class="{ 'opacity-40': rowVisibilityMap.get(row.id) === false }">
+          <tr v-for="row in table.getRowModel().rows" :key="row.id" :class="{ 'opacity-30': rowVisibilityMap.get(row.id) === false }">
             <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="border-b border-oscuro-100 py-2 text-center align-middle">
               <FlexRender
                 :render="cell.column.columnDef.cell"
